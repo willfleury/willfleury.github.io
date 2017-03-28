@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ## Building the Data Lake - How to get data out of Cassandra! 
 
 ### Overview

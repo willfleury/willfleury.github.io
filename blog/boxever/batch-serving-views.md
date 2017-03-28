@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ## Batch Serving Views - Blue Green Databases
 
 ### Overview 

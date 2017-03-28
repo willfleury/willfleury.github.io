@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ## Overview of Series
 
 ### Who are we?
