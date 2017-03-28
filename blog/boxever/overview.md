@@ -1,6 +1,3 @@
-- 
-{:toc}
-
 ## Overview of Series
 
 ### Who are we?
