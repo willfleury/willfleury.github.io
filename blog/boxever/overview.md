@@ -1,7 +1,42 @@
----
-layout: default
----
+[[TOC]]
 
-## Overview of the Boxever Blog Series
+## Overview of Series
 
-Content comming soon!
+### Who are we?
+
+Boxever<sup>TM</sup> is the Customer Intelligence Cloud for marketers. At the time of writing, we currently serve over 1 billion unique guest (user) profiles via our platform. In addition, we receive over 1 billion new events via our event streaming API every month, import 10s of millions of records via our Batch APIs, process 100s of millions of client requests via our REST APIs upon which we execute and serve 100s of millions of decisions each month. All of this results in an average of over 150 million **new** changelog messages being processed internally each day with peaks as much as twice this. Despite this scale, we currently serve personalisations (decisions) on our guest profiles with a p95 latency of 50ms! Our data volumes when we started the re architect described in this blog series were less than half of what they are today and at the time our infrastructure was starting to crumble under the load (equivalent p95 was over 500ms) and our costs starting to spiral out of control. We have a small engineering and operations team (15 and 3 respectively at the time of writing) which means we must design with this in mind. This blog series will bring you through our journey and how we achieve it, from where we were to where we are now.
+
+### Where were we?
+
+When you are a very early stage startup with everyone including the founders involved in prototyping and trying to understand the product direction the best architecture is most often a monolithic design. This enables faster feature hacking at the early stage and reduces the time spent on the operations side of things.    
+
+In Boxever we were no different. Initially we had a monolithic architecture both in terms of applications and databases. This central database was originally MySQL which we then migrated to Cassandra. As we moved to a more microservice oriented architecture we started moving various application entities out of the central database and into their own per-service database (aka [bounded contexts](https://martinfowler.com/bliki/BoundedContext.html)). This was great for our application level entities but for our behavioural and transactional data things weren’t so simple. Behavioural data needs to be treated differently due to its velocity and volume and instead of having a single datastore, you need to tier it and present it correctly for the given consumer and use case. By the time we had come to this realisation we were already in difficulty trying to work with our behavioural data. In fact, we were in trouble trying to work with any high velocity data that we stored only in our central database. 
+
+![image alt text](images/overview_image_0.png)
+
+A central part to our platform and product is a concept called the Guest Context. The Guest Context is a representation of a guest (profile) with all of their behavioural and transactional data attached. Think of it as an Object Graph originating at the Guest. It is this representation that we make decisions and recommendations on (in both batch and real time). That means we need fast, random access to this data and it must be capable of supporting high QPS without any performance degradation. As we have over 1 billion profiles in our platform, this is an immense challenge.
+
+With a single monolithic database you cannot achieve the necessary data tiering when you hit a certain data growth trajectory. The size of our monolithic database was growing rapidly and its costs rising significantly just so we could keep the data stored in a format unsuitable for processing (reading) for most of our use cases. To compound these issues, the way we modelled and hence stored a large proportion of our data was not suitable for a datastore like Cassandra and caused additional strain on the Cluster. 
+
+In addition to these concerns new SLA requirements were being requested to ensure we served personalisations as fast as possible. The bottleneck at the time was the storage when reading and assembling the Guest Context. It had dreadful median response times, never mind the 95 percentile ranges that we needed to satisfy. Due to how we structured and stored our data for our REST APIs and how we stored behavioural data, the number of reads we needed to perform to assemble the Guest Context for decisioning was nonlinear with the number of sessions and we could have hundreds to thousands of disks seeks being triggered on the cluster to satisfy a single query. The more fragmented the SSTables being read the higher the number of disk seeks required, and given the larger tables are more difficult to keep compacted properly it becomes a vicious circle. Conceptually, an optimised read of the Guest Context for decisioning would require only a single data access using the guest key. However it is not the optimal way to store it for REST APIs. Therefore we needed multiple "views" for reading the same data where each was optimised for the given read use case - think materialized views but maybe you might also be familiar with the terms [CQRS](https://martinfowler.com/bliki/CQRS.html) and [Event Sourcing](https://www.confluent.io/blog/event-sourcing-cqrs-stream-processing-apache-kafka-whats-connection/) (the core concepts have been around for a long time). 
+
+### What did we need to do?
+
+In order to create these materialized views, we decided to move towards an approach based on the Lambda Architecture with relevant data tiering and multiple views built with the data prepared in a manner optimised for their given consumer. At the end of the day the [Lambda Architecture](http://lambda-architecture.net/) is more a design pattern than a prescriptive architecture and how you apply it within your own set of constraints is unique. We investigated briefly the more recent [Kappa architecture](http://milinda.pathirage.org/kappa-architecture.com/) that was starting to evolve out of the work LinkedIn was doing on Apache Samza. The benefits being advertised of the Kappa architecture were that everything is a stream and so you only need one codebase instead of the typical batch and stream codebases required for Lambda. At the time, support for the Kappa approach was still in its infancy and the only real tooling for it was Samza which wasn’t even an Apache incubator at that stage. Similarly, some of its key concepts rely on some of the newer Kafka features around log compaction which were unavailable at the time (arguably this log compaction feature is a batch process anyway which in a way brings it back to lambda architecture). As mentioned before, we have always been a reasonably small engineering team in Boxever and so we decided to go with the relatively more proven Lambda Architecture and the wealth of tooling, frameworks and resources appearing for it rather than something less proven and supported. In addition to this, frameworks such as Apache Spark and Apache Flink were starting to grow in strength and maturity which allowed for writing your logic in one framework and having it run as both batch and streaming anyway. Hence you get some of the benefits of the Kappa Architecture while still implementing the Lambda Architecture. 
+
+![image alt text](images/overview_image_1.png)
+
+As previously discussed, the type of data and APIs we provide are not just streaming event based APIs with purely eventual consistency or asynchronous requirements. We also provide REST APIs to manage entities such as orders and guests within our platform. These APIs have read-after-write consistency requirements which placed some restrictions on the type of designs we could choose. 
+
+This roughly broke down into having the following types of storage or views:
+
+* CRUD database for REST APIs (existing Cassandra Cluster)
+* Persistent Append only Journal for Event Log (Kafka)
+* Data Lake File Based Storage (AWS S3)
+* Low latency read-only serving layer for batch views (unknown at the time)
+* Low Latency read-write serving layer for speed views (unknown at the time)
+
+Finally, with data tiering, we would only need to keep in each tier the data that we need and only for a easily configurable length of time. For instance our Kafka TTL is typically around 3 days. We no longer keep any behavioural data in our primary Cassandra cluster and we only keep 7 days worth of data in our Speed Layer Journal. We keep all of our data permanently on s3 and then build optimised views to provide access to this data in the most efficient way possible for the given consumer. 
+
+In the next few blog posts we will take you through how we achieved this, the challenges and the results. We hope it will be of some benefit to others.
+
