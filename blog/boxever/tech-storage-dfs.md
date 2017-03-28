@@ -2,7 +2,7 @@
 layout: default
 ---
 
-## Technology Choices
+## Technology, Storage and Data Format Choices
 
 ### Overview
 
