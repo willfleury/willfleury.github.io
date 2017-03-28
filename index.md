@@ -1,37 +1,22 @@
-## Welcome to GitHub Pages
+Hi, my name is Will Fleury and I'm a consultant Data Engineer and Machine Learning practitioner. I'm lucky enough to be working on a range of interesting problems from portfolio optimisation to short term wind forecasting in the renewable energy sector. I worked as a Principal Data Engineer at [Boxever](http://www.boxever.com) in the field of Big Data for a number of years where I tuned my data processing and data architecture skills (see the following [blog series](/blog/boxever/overview.md) for more information). I served a range of other roles over the years and even tried my hand as a founder in a couple of startups. See my LinkedIn [profile](https://www.linkedin.com/in/willfleury).
 
-You can use the [editor on GitHub](https://github.com/willfleury/willfleury.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+My academic background is more Engineering than Computer Science focused, however I've alternated in specialising between the two and don't quite consider myself to be purely in either camp. My PhD dissertation focused Decision Theory with applications primarily in Operations Research.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+I've always enjoyed solving problems in a variety of domains and continue to do so for both professional and personal incentives. On this site I attempt to document interesting projects, facts and musings I've picked up along the way in an attempt to organise my own thoughts better and catalogue my journey. If this in turn provides some useful information to others then that is a pleasant surprise. These areas cover
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Data Engineering 
 
-```markdown
-Syntax highlighted code block
+* The latest architectures and toolkits for managing Big Data
+* The JVM (one of the finest pieces of software engineering that exists)
 
-# Header 1
-## Header 2
-### Header 3
+Machine Learning
 
-- Bulleted
-- List
+* Neural Networks (MLPs before Deep Learning became the go to architecture)
+* Dimensionality Reduction (using Generative Models in particular)
+* Hyperparameter Optimisation
+* Various other ML problems from classification to forecasting
 
-1. Numbered
-2. List
+Quantitative Analysis
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/willfleury/willfleury.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+* Portfolio Optimisation and Quantitive analysis
