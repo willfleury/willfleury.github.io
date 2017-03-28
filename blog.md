@@ -1,7 +1,5 @@
 ---
 layout: default
-title: Blog
-description: Data Architecture, Machine Learning, Computer Science and other stuff..
 ---
 
 ## Blog Posts
