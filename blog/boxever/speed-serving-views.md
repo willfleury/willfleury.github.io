@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ## Speed Serving Views - Cassandra Time Series
 
 ### Overview
