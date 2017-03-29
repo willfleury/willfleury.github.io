@@ -1,9 +1,11 @@
 theme: jekyll-theme-cayman
 title: Will Fleury
-description: Data Architecture, Blog and other stuff..
+description: Data Engineer, Data Architect, Machine Learning Practitioner
 markdown: kramdown
 
 author: Will Fleury
+
+future: true
 
 gems:
   - jekyll-seo-tag

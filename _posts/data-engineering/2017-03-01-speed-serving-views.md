@@ -1,16 +1,21 @@
 ---
 layout: default
+title: Speed Serving Views
+description: Building Speed Serving Views for the Lambda Architecture with Cassandra Time Series
+categories: [data engineering, boxever]
 ---
 
-## Speed Serving Views - Cassandra Time Series
+## Speed Serving Views
+
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
 
 ### Overview
 
-As discussed in our blog on building [Batch Views](batch-serving-views.md), the batch views are read-only. Therefore to enable querying and retrieving the Guest changes since the batch view was last prepared we must implement a speed serving view. A process can then produce a real-time view of the Guest by querying the Batch and Speed serving views and merging the results. We will cover the merging process in the next blog post in this series. 
+As discussed in our blog on building [Batch Views]({% post_url /data-engineering/2017-03-01-batch-serving-views %}), the batch views are read-only. Therefore to enable querying and retrieving the Guest changes since the batch view was last prepared we must implement a speed serving view. A process can then produce a real-time view of the Guest by querying the Batch and Speed serving views and merging the results. We will cover the merging process in the next blog post in this series. 
 
-![image alt text](images/speed_views_image_0.png)
+![image alt text]({{ site.url }}/assets/images/data-engineering/speed_views_image_0.png)
 
-As can be seen in the above diagram, the data in this view is populated directly from the changelog events we publish to kafka (see our post on the [Changelog](changelog.md) for more details). The section in blue are the components related to the speed view. As this data also makes its way into the batch serving view eventually, the data in the speed layer has a short lifetime. This means that the data in the speed view is bounded and more easily managed. 
+As can be seen in the above diagram, the data in this view is populated directly from the changelog events we publish to kafka (see our post on the [Changelog]({% post_url /data-engineering/2017-03-01-changelog %}) for more details). The section in blue are the components related to the speed view. As this data also makes its way into the batch serving view eventually, the data in the speed layer has a short lifetime. This means that the data in the speed view is bounded and more easily managed. 
 
 In the above diagram, you will also notice that we have two services reading from the kafka changelog into the dedicated speed layer database. This is to separate the different traffic models that either come from the bulk imports via the Batch APIs or from the real time updates via the Interactive and Stream APIs. This is possible as each event has provenance information that indicates the path of entry for the update. The approach allows use to manage the different traffic models more effectively and ensures the more important real time updates are not delayed when indexing them to the speed layer. The updates via the Batch API can easily be throttled if necessary.  Another solution of course is to have separate kafka clusters and speed layer database clusters altogether for streaming and batch but this is more expensive, more complex and based on our observations of this architecture so far, unnecessary. 
 
@@ -35,7 +40,7 @@ The Redis data structure we used was a Hash ([HSET](https://redis.io/topics/data
 
 #### Time Series with Cassandra
 
-When we re-evaluated the requirements we realised the Cassandra was a better option for modelling our problem. We had concerns on the query latency at the p95 range based on the experiences with our primary Cassandra cluster. However we also knew that when used and tuned correctly, Cassandra could perform excellently at the p95 range as we saw with its usage for our [Batch Views](batch-serving-views.md). Initially we used m1.xlarge nodes for this cluster as it was the standard node type we had for Cassandra. However these had severe performance issues when under load. Fortunately when we changed to the newer m4.xlarge nodes with gp2 SSDs it performed brilliantly. With just 3 m4.xlarge nodes running Cassandra 2.2 we achieved p95 query response times of ~ 8ms at a sustained query rate of 500 qps and write rate of 1500 writes / second. Peaks can be multiples of this and in fact we have seen the write rates hitting 8k / second without significant degradation to query response times. So how did we configure Cassandra to achieve this?
+When we re-evaluated the requirements we realised the Cassandra was a better option for modelling our problem. We had concerns on the query latency at the p95 range based on the experiences with our primary Cassandra cluster. However we also knew that when used and tuned correctly, Cassandra could perform excellently at the p95 range as we saw with its usage for our [Batch Views]({% post_url /data-engineering/2017-03-01-batch-serving-views %}). Initially we used m1.xlarge nodes for this cluster as it was the standard node type we had for Cassandra. However these had severe performance issues when under load. Fortunately when we changed to the newer m4.xlarge nodes with gp2 SSDs it performed brilliantly. With just 3 m4.xlarge nodes running Cassandra 2.2 we achieved p95 query response times of ~ 8ms at a sustained query rate of 500 qps and write rate of 1500 writes / second. Peaks can be multiples of this and in fact we have seen the write rates hitting 8k / second without significant degradation to query response times. So how did we configure Cassandra to achieve this?
 
 The data model we used is shown below. It is based on the Datastax documentation on time series modelling with Cassandra [here](https://www.datastax.com/dev/blog/datetieredcompactionstrategy). From the primary key definition, you can see that we partition the data by the guest key. Cassandra under the hood stores the data for each key as a wide row. This ensures that all the data required to satisfy a query for a given key is located on the same partition and hence the same node. That means faster queries. The timestamp and entity ref make up the unique constraint for the primary key. We also define a clustering order based on the descending timestamp value for the record. This ensures that within each partition the records are stored in manner such that when we read the changes for a guest, we know that they are "in order" which allows for certain optimisations to be performed by the client (ignore older versions of same entity change event). It also means that when we query for changes in the last N hours, the data is already stored on disk in the most efficient way possible for reading back to the client. 
 

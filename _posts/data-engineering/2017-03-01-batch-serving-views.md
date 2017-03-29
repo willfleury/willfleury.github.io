@@ -1,12 +1,17 @@
 ---
 layout: default
+title: Batch Serving Views
+description: How to Serve Over 1B Records With a Read-Only Blue-Green Cassandra Database Deployment
+categories: [data engineering, boxever]
 ---
 
 ## Batch Serving Views - Blue Green Databases
 
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
+
 ### Overview 
 
-Blue-green deployment is an approach to replacing an active system with a newer version without impact to your production availability. In particular, blue-green database deployment means replacing an active dataset with a new one in an atomic operation without impacting incoming queries. This is critical for the Lambda Architecture which relies heavily on the ability to rebuild views. While we are rebuilding we do not want our response times to dive. Similarly we want the dataset preparation and refreshing to be as fast as possible at the scale of over 1 billion rows. This dataset is also **read-only** which is critical for thinking about solutions and optimisations which may otherwise not work (remember that in the Lambda approach, real-time changes are merged with the batch view later on) The approach we took was inspired in a large way by [SploutSQL](http://sploutsql.com/) which is the only real true blue green database solution we have come across which described the reasons for choosing a blue green database deployment architecture. These requirements include
+Blue-green deployment is an approach to replacing an active system with a newer version without impact to your production availability. In particular, blue-green database deployment means replacing an active dataset with a new one in an atomic operation without impacting incoming queries. This is critical for the Lambda Architecture which relies heavily on the ability to rebuild views. While we are rebuilding, we do not want our response times to dive. Similarly we want the dataset preparation and refreshing to be as fast as possible at a scale of over 1 billion rows. This dataset is also **read-only** which is critical for thinking about solutions and optimisations which may otherwise not work (remember that in the Lambda approach, real-time changes are merged with the batch view later on). The approach we took was inspired in a large way by [SploutSQL](http://sploutsql.com/) which is the only real true blue green database solution we have come across which described the reasons for choosing a blue green database deployment architecture. These requirements include
 
 * Read only
 * Atomic switch and rollback
@@ -17,9 +22,9 @@ Blue-green deployment is an approach to replacing an active system with a newer 
 * High availability - replicated partitions 
 * Easy Operations - cluster resizing or maintenance on next switch
 
-![image alt text](images/batch_views_image_0.png)
+![image alt text]({{ site.url }}/assets/images/data-engineering/batch_views_image_0.png)
 
-We achieved the above architecture on datasets with over 1 billion unique keys with a p95 latency under 5ms and capable of well over 1k QPS by serving the data on just **four** m4.xlarge instances with the replication factor set to 2. The instances had SSD based [gp](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html)[2 EBS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html) volumes attached. So how did we do this? Our limiting factors for preparation of the blue group nodes was the network card on the m4.xlarge instances (90 MBytes/sec). Downloading from s3 within the EC2 network is exceptionally fast and scalable! 
+We achieved the above architecture on datasets with over 1 billion unique keys with a p95 latency under 5ms and capable of well over 1k QPS by serving the data on just **four** m4.xlarge instances with the replication factor set to 2. The instances had SSD based [gp2 EBS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html) volumes attached. Our limiting factors for preparation of the blue group nodes was the network card on the m4.xlarge instances (90 MBytes/sec). Downloading from s3 within the EC2 network is exceptionally fast and scalable! So how did we do this? 
 
 ### What Database did we use? 
 
@@ -27,7 +32,7 @@ We spent some time researching what databases satisfied these requirements. One 
 
 We also investigated options on AWS such as Redis, Dynamo, etc but they were orders of magnitude too expensive for the quantity of data we needed to store and they did not allow us to write the database files offline which was critical for fast rebuilding. Other options like ElephantDB allowed writing the raw key-store files offline but everything else would need to be managed by us. We also investigated Voldemort which is a layer over another datastore and didn’t suit our needs.
 
-We then looked at Cassandra again. We had good operations experience with Cassandra and knew a lot of the ins and outs that take time to learn. We also knew that many of our latency concerns and pain points with Cassandra could be eliminated altogether due to the fact it would be read-only. Compactions would not be required and in fact are disabled. Repairs would not be required either and also disabled. [Bloom filters](https://docs.datastax.com/en/cassandra/2.1/cassandra/operations/ops_tuning_bloom_filters_c.html) ensured we could scale the number of indexes (records) well beyond the memory limits of a machine while experiencing very little performance impact. We also knew that we could use row caching (which as of version 2.2 was usable). We thought that we could write the sstables offline. Essentially it appeared to meet all of our requirements. 
+We then looked at Cassandra again. We had good operations experience with Cassandra and knew a lot of the ins and outs that take time to learn. We also knew that many of our latency concerns and pain points with Cassandra could be eliminated altogether due to the fact the dataset was read-only. Compactions would not be required and in fact are disabled. Repairs would not be required either and also disabled. [Bloom filters](https://docs.datastax.com/en/cassandra/2.1/cassandra/operations/ops_tuning_bloom_filters_c.html) ensured we could scale the number of indexes (records) well beyond the memory limits of a machine while experiencing very little performance impact. We also knew that we could use row caching (which as of version 2.2 was usable). We thought that we could write the sstables offline. Essentially it appeared to meet all of our requirements. 
 
 As with everything however, it was not as simple as it appeared and while it works better than we could have ever hoped, it had its challenges.
 
