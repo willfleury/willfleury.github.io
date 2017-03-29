@@ -1,16 +1,21 @@
 ---
 layout: default
+title: Merging the Serving Views
+description: How to Merge Serving Views in the Lambda Architecture
+categories: [data engineering, boxever]
 ---
 
 ## Merging the Serving Views 
 
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
+
 ### Overview
 
-The final part of this blog series will cover how we provide access to query and merge the various serving views in real time. If you have not read the previous posts in this series, I recommend you do so to fully understand what we will present in this post and how we arrived at this point (see [Overview](overview.md) of Series).  
+The final part of this blog series will cover how we provide access to query and merge the various serving views in real time. If you have not read the previous posts in this series, I recommend you do so to fully understand what we will present in this post and how we arrived at this point (see [Overview]({% post_url /data-engineering/2017-03-01-overview %}) of Series).  
 
 Up to this point we have covered how we built the various serving views for the Guest Context. We have described how we built both the batch and speed datasets to ensure we have access to both historic and real time changes related to a Guest. However, one of the details regarding how to implement a lambda architecture which always left me confused or unsure was the merging of all these views to satisfy a query from a consumer who wants to see the single merged record. It turns out to be surprisingly simple when developed in the way we have and hopefully what we present here will aid others who might have the same questions and uncertainty about the process as when we started. 
 
-![image alt text](images/merge_views_image_0.png)
+![image alt text]({{ site.url }}/assets/images/data-engineering/merge_views_image_0.png)
 
 As can be seen from the diagram above, we have various services within our architecture which require access to the Guest Context. These include the UI, the decision engine and various other components. As we have a microservice based architecture, the most logical way to provide access to this merged data was via a microservice which we have aptly named the Guest Context Service. 
 
@@ -24,7 +29,7 @@ The Guest Context Service is a read only service which serves requests for a giv
 
 As a concrete example, we will provide sample data for a Guest whose name has recently changed and who has cancelled a previous order. The name change and the order cancellation are visible in the Speed view and so we see change log events for those. The original and historical guest name and order status are contained in the Batch view. 
 
-If you do not know how we store this change log data in the Speed view, I recommend you read the blog post on [Speed Views](speed-serving-views.md).
+If you do not know how we store this change log data in the Speed view, I recommend you read the blog post on [Speed Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %}).
 
 Guest changelog data in speed view
 
@@ -102,11 +107,11 @@ Note that in our production systems, timestamps are published and written as mil
 
 #### Determining which Batch View to Query (Blue-Green)
 
-As we covered in the blog post on [Batch Serving Views](batch-serving-views.md), we implement a blue-green deployment strategy for these views. This means that the serving responsible for merging the views must be aware of which cluster is currently green and query it accordingly. For performance reasons we also want to ensure that queries are routed to the same node in this cluster always (i.e. sticky routing) so the row-cache is effective. Luckily all of this is abstracted away from the service itself via a custom extension to the datastax driver we wrote. The switching from cluster to cluster is seamless from the services perspective. For more information on how all of this works, check out the [blog post](batch-serving-views.md) on it.
+As we covered in the blog post on [Batch Serving Views]({% post_url /data-engineering/2017-03-01-batch-serving-views %}), we implement a blue-green deployment strategy for these views. This means that the serving responsible for merging the views must be aware of which cluster is currently green and query it accordingly. For performance reasons we also want to ensure that queries are routed to the same node in this cluster always (i.e. sticky routing) so the row-cache is effective. Luckily all of this is abstracted away from the service itself via a custom extension to the datastax driver we wrote. The switching from cluster to cluster is seamless from the services perspective. For more information on how all of this works, check out the [blog post]({% post_url /data-engineering/2017-03-01-speed-serving-views %}) on it.
 
 #### Determining the Speed Layer Query Window
 
-As discussed in the blog post of the [Speed Views](speed-serving-views.md), we treat the speed layer database as a time series and we keep the last 7 days of change events in it. However we do not always want to query the full 7 days worth of data and in fact it would be suboptimal to do so if we only needed the last 24 hours worth. 
+As discussed in the blog post of the [Speed Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %}), we treat the speed layer database as a time series and we keep the last 7 days of change events in it. However we do not always want to query the full 7 days worth of data and in fact it would be suboptimal to do so if we only needed the last 24 hours worth. 
 
 The Guest Context Service is able to access additional meta related to the current active batch serving view. This metadata is stored in Zookeeper and contains information like the timestamp for the current active dataset (when the data for it was last prepared). The following equation is how we calculate the optimal query window to use for the speed view.
 

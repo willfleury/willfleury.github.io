@@ -1,8 +1,13 @@
 ---
 layout: default
+title: Developing a Flexible Changelog
+description: Building a Flexible Changelog on top Kafka for the Lambda Architecture
+categories: [data engineering, boxever]
 ---
 
 ## The Changelog
+
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
 
 ### Overview
 
@@ -10,7 +15,7 @@ In order to avoid having siloed monolithic datastores, you must ensure that the 
 
 To propagate this change log around you need a distributed messaging system. We use Kafka for our distributed messaging system. There are many features of the Kafka architecture that make it absolutely ideal for Big Data messaging systems but in the simplest terms it is that it functions as a highly scalable append only distributed commit log. 
 
-![image alt text](images/changelog_image_0.png)
+![image alt text]({{ site.url }}/assets/images/data-engineering/changelog_image_0.png)
 
 There are no transactions with Kafka which forces you to think in other ways (like idempotency) and this is a mindset and pattern you must use in Big Data systems. Kafka can achieve very high throughput rates for both producers and consumers without issue and you will find most often that the network is the bottleneck (its use of the [zero-copy](https://www.ibm.com/developerworks/library/j-zerocopy/) functionality in the JVM is particularly nice and facilitates high throughput).
 
@@ -22,7 +27,7 @@ There are newer approaches to dealing with this issue of read-after-write consis
 
 Another way people work around the issue of publishing changes from the database which is source of truth to Kafka (or another messaging system or datastore) is by hooking into the commit log of the database. This has the added benefit of requiring no producer changes and in fact it is transparent to the producer. The services only write to one location! One particular solution I’ve used in a previous life was Oracle Golden Gate for replicating changes from an Oracle 11G database to an IBM Websphere message queue. There are similar connectors for consuming from various other RDBMS systems (e.g. [mysql](https://github.com/shyiko/mysql-binlog-connector-java), [postgresql](https://github.com/confluentinc/bottledwater-pg)) and producing to a variety of datastores including Kafka. 
 
-![image alt text](images/changelog_image_1.png)
+![image alt text]({{ site.url }}/assets/images/data-engineering/changelog_image_1.png)
 
 Unfortunately it's not possible to achieve this with Cassandra as the Cassandra commitlog does not contain sufficient information since it only contains the new attribute values for the key that was updated - we cover in the following section why this is not enough.
 

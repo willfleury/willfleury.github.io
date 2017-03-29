@@ -2,13 +2,16 @@
 layout: default
 title: Technology, Storage and Data Format Choices
 description: What are the technology choices when implementing the Lambda Architecture
+categories: [data engineering, boxever]
 ---
 
 ## Technology, Storage and Data Format Choices
 
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
+
 ### Overview
 
-As we discussed in our previous post outlining this [series](overview.md), when we started out on this journey we had no batch data pipeline at all and everything was stored in a single monolithic Cassandra database. This meant that there were a huge number of unknowns which we had to solve. Simple questions were unanswerable such as how many entities of type A did we have (remember that we couldn’t read all of our data out of the monolith cluster)? What size would all our data be in format X or Y? How long would it take to rebuild view Z? What was the best framework? Would our bottleneck be storage speed, network, cpu or memory? It's difficult to plan too far ahead when you cannot answer these questions and so as we progressed through each stage in the pipeline we had to analyse what we learned from the previous stages and see if it had any impact on how we thought we would approach the subsequent stage.
+As we discussed in our previous post outlining this [series]({% post_url /data-engineering/2017-03-01-overview %}), when we started out on this journey we had no batch data pipeline at all and everything was stored in a single monolithic Cassandra database. This meant that there were a huge number of unknowns which we had to solve. Simple questions were unanswerable such as how many entities of type A did we have (remember that we couldn’t read all of our data out of the monolith cluster)? What size would all our data be in format X or Y? How long would it take to rebuild view Z? What was the best framework? Would our bottleneck be storage speed, network, cpu or memory? It's difficult to plan too far ahead when you cannot answer these questions and so as we progressed through each stage in the pipeline we had to analyse what we learned from the previous stages and see if it had any impact on how we thought we would approach the subsequent stage.
 
 We had a few months earlier developed a Batch Import product feature which allowed us to familiarise ourselves with the myriad of technology choices available in this space (albeit for a different use case). There are a number of initial choices you have to make which can become important later. All choices can be changed later of course - the more you learn or as spaces evolve - but it is important to weigh up your options correctly. 
 
