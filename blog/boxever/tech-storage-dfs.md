@@ -1,5 +1,7 @@
 ---
 layout: default
+title: Technology, Storage and Data Format Choices
+description: What are the technology choices when implementing the Lambda Architecture
 ---
 
 ## Technology, Storage and Data Format Choices

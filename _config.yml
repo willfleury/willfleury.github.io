@@ -1,4 +1,10 @@
 theme: jekyll-theme-cayman
 title: Will Fleury
-description: Blog and other stuff..
+description: Data Architecture, Blog and other stuff..
 markdown: kramdown
+
+author: Will Fleury
+
+gems:
+  - jekyll-seo-tag
+  - jekyll-sitemap
