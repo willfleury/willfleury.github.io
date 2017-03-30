@@ -13,7 +13,7 @@ This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overvie
 
 As discussed in our blog on building [Batch Views]({% post_url /data-engineering/2017-03-01-batch-serving-views %}), the batch views are read-only. Therefore to enable querying and retrieving the Guest changes since the batch view was last prepared we must implement a speed serving view. A process can then produce a real-time view of the Guest by querying the Batch and Speed serving views and merging the results. We will cover the merging process in the next blog post in this series. 
 
-![image alt text]({{ site.url }}/assets/images/data-engineering/speed_views_image_0.png)
+{% include image.html img="/assets/images/data-engineering/speed_views_image_0.png" title="Speed Serving View Architecture" caption="Speed Serving View Architecture" %}
 
 As can be seen in the above diagram, the data in this view is populated directly from the changelog events we publish to Kafka (see our post on the [Changelog]({% post_url /data-engineering/2017-03-01-changelog %}) for more details). The section in blue are the components related to the speed view. As this data also makes its way into the batch serving view eventually, the data in the speed layer has a short lifetime. This means that the data in the speed view is bounded and more easily managed. 
 

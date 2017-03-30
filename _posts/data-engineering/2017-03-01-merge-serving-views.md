@@ -15,7 +15,7 @@ The final part of this blog series will cover how we provide access to query and
 
 Up to this point we have covered how we built the various serving views for the Guest Context. We have described how we built both the batch and speed datasets to ensure we have access to both historic and real time changes related to a Guest. However, one of the details regarding how to implement a lambda architecture which always left me confused or unsure was the merging of all these views to satisfy a query from a consumer who wants to see the single merged record. It turns out to be surprisingly simple when developed in the way we have and hopefully what we present here will aid others who might have the same questions and uncertainty about the process as when we started. 
 
-![image alt text]({{ site.url }}/assets/images/data-engineering/merge_views_image_0.png)
+{% include image.html img="/assets/images/data-engineering/merge_views_image_0.png" title="Serving Views Merging Architecture" caption="Serving Views Merging Architecture" %}
 
 As can be seen from the diagram above, we have various services within our architecture which require access to the Guest Context. These include the UI, the decision engine and various other components. As we have a microservice based architecture, the most logical way to provide access to this merged data was via a microservice which we have aptly named the Guest Context Service. 
 

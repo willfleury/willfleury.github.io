@@ -22,7 +22,7 @@ Blue-green deployment is an approach to replacing an active system with a newer 
 * High availability - replicated partitions 
 * Easy Operations - cluster resizing or maintenance on next switch
 
-![image alt text]({{ site.url }}/assets/images/data-engineering/batch_views_image_0.png)
+{% include image.html img="/assets/images/data-engineering/batch_views_image_0.png" title="Batch Views - Blue Green Architecture" caption="Batch Views - Blue Green Architecture" %}
 
 We achieved the above architecture on datasets with over 1 billion unique keys with a p95 latency under 5ms and capable of well over 1k QPS by serving the data on just **four** m4.xlarge instances with the replication factor set to 2. The instances had SSD based [gp2 EBS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html) volumes attached. Our limiting factors for preparation of the blue group nodes was the network card on the m4.xlarge instances (90 MBytes/sec). Downloading from s3 within the EC2 network is exceptionally fast and scalable! So how did we do this? 
 

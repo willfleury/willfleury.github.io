@@ -20,3 +20,13 @@
 .btn {
   min-width: 100px;
 }
+
+.image-wrapper {
+    text-align: center;
+
+    .image-caption {
+        color: #aaa;
+        font-size: small;
+        margin-top: 0em;
+    }
+}
