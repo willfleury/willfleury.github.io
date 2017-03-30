@@ -13,7 +13,7 @@ This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overvie
 
 The final part of this blog series will cover how we provide access to query and merge the various serving views in real time. If you have not read the previous posts in this series, I recommend you do so to fully understand what we will present in this post and how we arrived at this point (see [Overview]({% post_url /data-engineering/2017-03-01-overview %}) of Series).  
 
-Up to this point we have covered how we built the various serving views for the Guest Context. We have described how we built both the batch and speed datasets to ensure we have access to both historic and real time changes related to a Guest. However, one of the details regarding how to implement a lambda architecture which always left me confused or unsure was the merging of all these views to satisfy a query from a consumer who wants to see the single merged record. It turns out to be surprisingly simple when developed in the way we have and hopefully what we present here will aid others who might have the same questions and uncertainty about the process as when we started. 
+Up to this point we have covered how we built the various serving views for the Guest Context. We have described how we built both the batch and speed datasets to ensure we have access to both historic and real time changes related to a Guest. However, one of the details regarding how to implement a Lambda Architecture which always left me confused or unsure was the merging of all these views to satisfy a query from a consumer who wants to see the single merged record. It turns out to be surprisingly simple when developed in the way we have and hopefully what we present here will aid others who might have the same questions and uncertainty about the process as when we started. 
 
 {% include image.html img="/assets/images/data-engineering/merge_views_image_0.png" title="Serving Views Merging Architecture" caption="Serving Views Merging Architecture" %}
 
@@ -117,7 +117,7 @@ The Guest Context Service is able to access additional meta related to the curre
 
     query_window_ms = now() - active_batch_dataset_ts_ms + overlap_duration_ms
 
-The overlap duration is a safety net for data races with entities published just before midnight not being present in the batch serving view prepared for that midnight (various reasons for this but primarily how Secor is configured to upload to S3). We typically use an overlap window of 12 hours. 
+The overlap duration is a safety net for data races with entities published just before midnight not being present in the batch serving view prepared for that midnight (various reasons for this but primarily how [Secor](https://github.com/pinterest/secor) is configured to upload to [S3](https://aws.amazon.com/s3/)). We typically use an overlap window of 12 hours. 
 
 We use Zookeeper watches (via [Apache Curator](http://curator.apache.org/curator-framework/)) to monitor the dataset metadata for changes. This means that if a rollback is performed on the batch serving view for any reason, we will automatically adjust our query window to take account of this. This is fantastic from an operational perspective and means that rollbacks can be seamlessly applied without any manual action required. 
 

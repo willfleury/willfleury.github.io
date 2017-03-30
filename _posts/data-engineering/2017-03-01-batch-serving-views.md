@@ -24,7 +24,7 @@ Blue-green deployment is an approach to replacing an active system with a newer 
 
 {% include image.html img="/assets/images/data-engineering/batch_views_image_0.png" title="Batch Views - Blue Green Architecture" caption="Batch Views - Blue Green Architecture" %}
 
-We achieved the above architecture on datasets with over 1 billion unique keys with a p95 latency under 5ms and capable of well over 1k QPS by serving the data on just **four** m4.xlarge instances with the replication factor set to 2. The instances had SSD based [gp2 EBS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html) volumes attached. Our limiting factors for preparation of the blue group nodes was the network card on the m4.xlarge instances (90 MBytes/sec). Downloading from s3 within the EC2 network is exceptionally fast and scalable! So how did we do this? 
+We achieved the above architecture on datasets with over 1 billion unique keys with a p95 latency under 5ms and capable of well over 1k QPS by serving the data on just **four** m4.xlarge instances with the replication factor set to 2. The instances had SSD based [gp2 EBS](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html) volumes attached. Our limiting factors for preparation of the blue group nodes was the network card on the m4.xlarge instances (90 MBytes/sec). Downloading from [S3](https://aws.amazon.com/s3/) within the EC2 network is exceptionally fast and scalable! So how did we do this? 
 
 ### What Database did we use? 
 
@@ -48,7 +48,7 @@ The third issue we hit was that the SSTable writer for some bizarre reason does 
 
 #### Record Partitioning
 
-The next challenge we encountered was partitioning the data. We needed to ensure that as we wrote the records we obeyed the Cassandra partitioning scheme and that we wrote data which belonged to the same node in contiguous partition buckets on Spark (to ensure we could download contiguous ranges to each Cassandra node from s3).
+The next challenge we encountered was partitioning the data. We needed to ensure that as we wrote the records we obeyed the Cassandra partitioning scheme and that we wrote data which belonged to the same node in contiguous partition buckets on Spark (to ensure we could download contiguous ranges to each Cassandra node from S3).
 
 Cassandra can be used with either multiple virtual nodes (vnodes) or a single token per node. We decided not to use vnodes as it overcomplicates our solution and vnodes are really designed to simplify scaling out and rebalancing your cluster which we would never require (as we could just change the cluster setup on the next blue green switch). 
 
@@ -79,7 +79,7 @@ This gives us the following token ranges.
 
 As we generate the SSTables in Spark and Spark has its own partitioning we need to ensure that it partitions the data as Cassandra is expecting it. The correct records needs to be in the correct SSTables and placed on the correct node. To ensure this we configure our Spark partitioning so that a record which is destined for a given Cassandra token range can end up in a given Spark partition range. `Token -> [l,u]`.
 
-The following example show how this works. Say we want 1024 partitions in spark job. This will result in 1024 partition folders (buckets) on s3. The records are partitioned into SSTables in each of these buckets as follows
+The following example show how this works. Say we want 1024 partitions in spark job. This will result in 1024 partition folders (buckets) on S3. The records are partitioned into SSTables in each of these buckets as follows
 
     Token Range A gets partitions [0,    255]
     Token Range B gets partitions [256,  511]
@@ -201,7 +201,7 @@ ResultSet rs = driverState.getSession().execute(bound);
 
 The orchestration is managed by a custom python application. This is deployed as a sidecar/co-process on each cassandra node within the blue/green cluster. Zookeeper is used by the co-processes for coordination. Each orchestrator is responsible for the following:
 
-* Downloading the data from s3 for token range the node serves
+* Downloading the data from S3 for token range the node serves
 * Synchronizing on nodes ready (distributed barrier using Zookeeper)
 * Validating cluster preparation
 * Notifying clients to switch cluster
