@@ -1,6 +1,5 @@
 _site/
 .idea/
 *.iml
-Gemfile
 Gemfile.lock
 .DS_Store
