@@ -31,17 +31,17 @@ As a concrete example, we will provide sample data for a Guest whose name has re
 
 If you do not know how we store this change log data in the Speed view, I recommend you read the blog post on [Speed Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %}).
 
-Guest changelog data in speed view
+Guest changelog data in Speed view
 
     {"ref": "1", "firstName": "John", …, "modifiedAt": "2017-03-26T16:38:19.100Z"}
     {"ref": "1", "firstName": "Johnny", …, "modifiedAt": "2017-03-26T16:42:59.250Z"}
 
-Guest Order changelog data in speed view
+Guest Order changelog data in Speed view
 
     {"ref": "123", "status": "CANCELLED", …, "modifiedAt": "2017-03-26T16:42:00.000Z"}
 
 
-We can see that we have two change log records in the speed layer for the given Guest. However, when merging we only use the record with the latest modifiedAt timestamp for entities with the same ref and we disregard the others. Therefore when we recombine the above records and we end up with the following Guest Context in the Speed view. 
+We can see that we have two change log records in the speed layer for the given Guest. However, when merging we only use the record with the latest modifiedAt timestamp for entities with the same ref and we disregard the others. Therefore when we recombine the above records, we end up with the following Guest Context in the Speed view. 
 
     {
        "ref": "1",
@@ -125,7 +125,9 @@ We use Zookeeper watches (via [Apache Curator](http://curator.apache.org/curator
 
 At the time of writing, we currently serve over 1 billion unique guest (user) profiles via our platform. In addition, we receive over 1 billion new events via our event streaming API every month, import 10s of millions of records via our Batch APIs, process 100s of millions of client requests via our REST APIs upon which we execute and serve 100s of millions of decisions each month. All of this results in an average of over 150 million **new** changelog messages being processed internally each day with peaks as much as twice this. Our data volumes when we started the re architect described in this blog series were less than half of what they are today and at the time our infrastructure was starting to crumble under the load (the p95 for serving personalisations was over 500ms) and our costs starting to spiral out of control.
 
-Thanks to the re architect we currently serve personalisations (decisions) on our guest profiles with a p95 latency of 50ms! We also have a very flexible architecture where adding new views and new Product use cases became an order of magnitude easier. We achieved all of this with a small engineering and operations team of only ~ 15 and ~3 respectively at the time of writing. 
+Thanks to the re architect we currently serve personalisations (decisions) on our guest profiles with a p95 latency of 50ms! We also have a very flexible architecture where adding new views and new product use cases became an order of magnitude easier. 
 
-We hope this series has been some help in explaining the thought process and challenges we faced. 
+We delivered a completely new data science platform using [Spark](http://spark.apache.org/), [Zeppelin](https://zeppelin.apache.org/) and [S3](https://aws.amazon.com/s3/). We delivered a new analytics platform using [Presto](https://prestodb.io/), [Parquet](https://parquet.apache.org/) and S3. All of this meant we transformed our ability as a company to deliver insight from our data.
+
+We achieved all of this with a small engineering and operations team of only ~ 15 and ~3 respectively at the time of writing. We hope this series has been some help in explaining the thought process and challenges we faced. 
 
