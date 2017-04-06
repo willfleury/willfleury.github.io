@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Batch Serving Views
-description: How to Serve Over 1B Records With a Read-Only Blue-Green Cassandra Database Deployment
+description: How to Serve Over 1B Records with a Read-Only Blue-Green Cassandra Database Deployment
 categories: [data engineering, boxever]
 ---
 
