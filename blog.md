@@ -14,5 +14,5 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 * [The Changelog]({% post_url /data-engineering/2017-03-01-changelog %})
 * [Batch Serving Views]({% post_url /data-engineering/2017-03-01-batch-serving-views %})
 * [Speed Serving Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %})
-* [Merge Serving Views]({% post_url /data-engineering/2017-03-01-merge-serving-views %})
+* [Querying & Merging Views]({% post_url /data-engineering/2017-03-01-merge-serving-views %})
 
