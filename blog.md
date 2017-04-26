@@ -16,3 +16,4 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 * [Speed Serving Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %})
 * [Querying & Merging Views]({% post_url /data-engineering/2017-03-01-merge-serving-views %})
 
+
