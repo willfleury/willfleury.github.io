@@ -111,7 +111,7 @@ As we covered in the blog post on [Batch Serving Views]({% post_url /data-engine
 
 #### Determining the Speed Layer Query Window
 
-As discussed in the blog post of the [Speed Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %}), we treat the speed layer database as a time series and we keep the last 7 days of change events in it. However we do not always want to query the full 7 days worth of data and in fact it would be suboptimal to do so if we only needed the last 24 hours worth. 
+As discussed in the blog post on the [Speed Views]({% post_url /data-engineering/2017-03-01-speed-serving-views %}), we treat the speed layer database as a time series and we keep the last 7 days of change events in it. However we do not always want to query the full 7 days worth of data and in fact it would be suboptimal to do so if we only needed the last 24 hours worth. 
 
 The Guest Context Service is able to access additional meta related to the current active batch serving view. This metadata is stored in [Zookeeper](https://zookeeper.apache.org/) and contains information like the timestamp for the current active dataset (when the data for it was last prepared). The following equation is how we calculate the optimal query window to use for the speed view.
 
