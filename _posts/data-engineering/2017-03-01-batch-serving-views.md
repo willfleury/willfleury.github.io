@@ -274,8 +274,8 @@ The orchestration process implements the following Finite State Machines (FSM). 
                 if still green
                     return to listen for blue-green switch
     
-                if no change after max timeout
-                    exit with failure
+            if no change after max timeout
+                exit with failure
 
 
 
