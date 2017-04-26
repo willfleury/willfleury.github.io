@@ -11,7 +11,7 @@ This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overvie
 
 ### Overview
 
-To avoid building siloed monolithic datastores, one must ensure that the entity changes applied in one datastore are visible to downstream systems. In addition to this, one of the fundamental requirements of the [Lambda Architecture](http://lambda-architecture.net/) is the presence of an append only immutable data store that acts as a system of record for all changes. This is known as [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) and we call the append only journal we store these changes in - the changelog. 
+To avoid building siloed monolithic datastores, one must ensure that the entity changes applied in one datastore are visible to downstream systems. In addition to this, one of the fundamental requirements of the [Lambda Architecture](http://lambda-architecture.net/) is the presence of an append only immutable datastore that acts as a system of record for all changes. This is known as [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) and we call the append only journal we store these changes in - the changelog. 
 
 To propagate this changelog around you need a distributed messaging system. We use [Kafka](https://kafka.apache.org/) as our distributed messaging system. There are many features of the Kafka architecture that make it ideal for Big Data messaging systems but in the simplest terms, it is that it functions as a highly scalable, append only, distributed commit log. 
 
@@ -66,7 +66,7 @@ Thanks to how we publish the messages, we can easily produce a representation wi
 
 ### Data Provenance  
 
-Data provenance is used to provide a historical record about the data and its origins. It is essentially metadata about the source of the data. When you receive data from many sources it can become difficult to trace which source the data came from when looking at it in some data store much further downstream. This can become even more complicated when you have more than one source for the same data where one can update the other. Again if you are looking at the current state in some datastore downstream there are some key questions you might want to know about the origins of the data. These might include which API, Service or Provider did this come from. Is it composed of more than one and what was the data passed from each that resulted in the current state. This information can also prove to be invaluable for debugging, audit trails and security purposes.
+Data provenance is used to provide a historical record about the data and its origins. It is essentially metadata about the source of the data. When you receive data from many sources it can become difficult to trace which source the data came from when looking at it in some datastore much further downstream. This can become even more complicated when you have more than one source for the same data where one can update the other. Again if you are looking at the current state in some datastore downstream there are some key questions you might want to know about the origins of the data. These might include which API, Service or Provider did this come from. Is it composed of more than one and what was the data passed from each that resulted in the current state. This information can also prove to be invaluable for debugging, audit trails and security purposes.
 
 Providing provenance information along with an event sourcing based architecture means that you can always track down and answer these questions. 
 

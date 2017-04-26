@@ -131,3 +131,4 @@ We delivered a completely new data science platform using [Spark](http://spark.a
 
 We achieved all of this with a small engineering and operations team of only ~ 15 and ~3 respectively at the time of writing. We hope this series has been some help in explaining the thought process and challenges we faced. 
 
+A special thanks to Pete Baron & Rodrigue Alcazar for their reviews and feedback while writing this series.
