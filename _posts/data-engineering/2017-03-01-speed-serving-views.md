@@ -46,25 +46,27 @@ The data model we used is shown below. It is based on the Datastax documentation
 
 One column in our schema which is worth highlighting is the `deleted` marker. Remember we are storing our changelog as a time series in Cassandra. We never actually delete data ourselves and data is aged out by the TTL process only. Therefore in a true changelog fashion if an entity related to a guest has been deleted, we actually write an event to the journal in Cassandra with the deleted column set. When reading the data we can then apply this delete in the client (i.e. if last journal entry for a given entity has the delete marker set then we know the entity is no longer associated with the given Guest).  
 
-    CREATE TABLE IF NOT EXISTS boxever_guest_context.journal (
-      key text,
-      ts timestamp,
-      ref UUID,
-      type text,
-      event blob,
-      deleted boolean,
-      PRIMARY KEY ((key), ts, ref))
-      WITH CLUSTERING ORDER BY (ts DESC)
-      AND gc_grace_seconds = 0
-      AND default_time_to_live = 604800
-      AND compaction = {
-        'class':'DateTieredCompactionStrategy',
-        'timestamp_resolution':'MICROSECONDS',
-        'base_time_seconds':'3600',
-        'min_threshold' : 4,
-        'max_sstable_age_days':'2',
-        'tombstone_compaction_interval':'1'
-      };
+```sql
+CREATE TABLE IF NOT EXISTS boxever_guest_context.journal (
+  key text,
+  ts timestamp,
+  ref UUID,
+  type text,
+  event blob,
+  deleted boolean,
+  PRIMARY KEY ((key), ts, ref))
+WITH CLUSTERING ORDER BY (ts DESC)
+AND gc_grace_seconds = 0
+AND default_time_to_live = 604800
+AND compaction = {
+'class':'DateTieredCompactionStrategy',
+'timestamp_resolution':'MICROSECONDS',
+'base_time_seconds':'3600',
+'min_threshold' : 4,
+'max_sstable_age_days':'2',
+'tombstone_compaction_interval':'1'
+};
+```
 
 You can also see from the schema that we have the TTL set to 7 days. This allows us to take partial time slices of the entity change log for any time period in the last 7 days. Keeping some additional headroom between the rebuild frequency of the batch serving views and the TTL in the speed layer is important so that the merging layer can dynamically expand the query window it uses based on the current active batch view dataset. Having the additional headroom makes for a very operationally stable system. We will cover this in more detail when we discuss how we merge the batch and speed views. 
 

@@ -33,54 +33,62 @@ If you do not know how we store this change log data in the Speed view, I recomm
 
 Guest changelog data in Speed view
 
-    {"ref": "1", "firstName": "John", …, "modifiedAt": "2017-03-26T16:38:19.100Z"}
-    {"ref": "1", "firstName": "Johnny", …, "modifiedAt": "2017-03-26T16:42:59.250Z"}
+```json
+{"ref": "1", "firstName": "John", …, "modifiedAt": "2017-03-26T16:38:19.100Z"}
+{"ref": "1", "firstName": "Johnny", …, "modifiedAt": "2017-03-26T16:42:59.250Z"}
+```
 
 Guest Order changelog data in Speed view
 
-    {"ref": "123", "status": "CANCELLED", …, "modifiedAt": "2017-03-26T16:42:00.000Z"}
-
+```json
+{"ref": "123", "status": "CANCELLED", …, "modifiedAt": "2017-03-26T16:42:00.000Z"}
+```
 
 We can see that we have two change log records in the speed layer for the given Guest. However, when merging we only use the record with the latest modifiedAt timestamp for entities with the same ref and we disregard the others. Therefore when we recombine the above records, we end up with the following Guest Context in the Speed view. 
 
-    {
-       "ref": "1",
-       "firstName": "Johnny",
-       ….
-       "modifiedAt": "2017-03-26T16:42:59.250",
-    
-       "orders": [{
-          "ref": "1",
-          "status": "CANCELLED",
-          …..
-          "modifiedAt": "2017-03-26T16:42:00.000Z"
-       }]
-    }
+```json
+{
+   "ref": "1",
+   "firstName": "Johnny",
+   ….
+   "modifiedAt": "2017-03-26T16:42:59.250",
+
+   "orders": [{
+      "ref": "1",
+      "status": "CANCELLED",
+      …..
+      "modifiedAt": "2017-03-26T16:42:00.000Z"
+   }]
+}
+```
 
 We then combine the Speed view with the following Guest Context from the Batch view.
 
-    {
-       "ref": "1",
-       "firstName": "John",
-       …..
-       "modifiedAt": "2017-03-24T12:18:19.100Z",
-    
-       "orders": [{
-          "ref": "123",
-          "status": "PURCHASED",
-          …..
-          "modifiedAt": "2017-03-24T12:20:01.000Z"
-       },
-       {
-          "ref": "456",
-          "status": "PURCHASED",
-          …..
-          "modifiedAt": "2016-12-10T22:20:15.000Z"
-       }]
-    }
+```json
+{
+   "ref": "1",
+   "firstName": "John",
+   …..
+   "modifiedAt": "2017-03-24T12:18:19.100Z",
+
+   "orders": [{
+      "ref": "123",
+      "status": "PURCHASED",
+      …..
+      "modifiedAt": "2017-03-24T12:20:01.000Z"
+   },
+   {
+      "ref": "456",
+      "status": "PURCHASED",
+      …..
+      "modifiedAt": "2016-12-10T22:20:15.000Z"
+   }]
+}
+```
 
 Again, performing only matching based on the modifiedAt timestamp, we produce the following merged view of the Guest Context.
 
+```json
     {
        "ref": "1",
        "firstName": "Johnny",
@@ -100,6 +108,7 @@ Again, performing only matching based on the modifiedAt timestamp, we produce th
           "modifiedAt": "2016-12-10T22:20:15.000Z"
        }]
     }
+```
 
 Note that in our production systems, timestamps are published and written as milliseconds since the unix epoc. We are only using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format here to aid in understanding the above. 
 

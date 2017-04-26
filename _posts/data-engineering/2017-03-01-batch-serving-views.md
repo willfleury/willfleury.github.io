@@ -101,16 +101,17 @@ As the data is read-only and the same row is typically read multiple times durin
 
 #### Schema Definition 
 
-    create table IF NOT EXISTS boxever_guest_context.guest_context (
-        guest_key text,
-        context blob,
-        PRIMARY KEY(guest_key)
-    ) WITH read_repair_chance = 0.0
-      AND caching = { 'keys' : 'ALL', 'rows_per_partition' : '1' }
-      AND dclocal_read_repair_chance = 0.0
-      AND compaction = {'class':'SizeTieredCompactionStrategy', 'enabled':false}
-      AND speculative_retry = 'NONE';
-
+```sql
+CREATE TABLE IF NOT EXISTS boxever_guest_context.guest_context (
+  guest_key text,
+  context blob,
+  PRIMARY KEY(guest_key)) 
+WITH read_repair_chance = 0.0
+AND caching = { 'keys' : 'ALL', 'rows_per_partition' : '1' }
+AND dclocal_read_repair_chance = 0.0
+AND compaction = {'class':'SizeTieredCompactionStrategy', 'enabled':false}
+AND speculative_retry = 'NONE';
+```
 
 ### Querying the Cluster
 
@@ -173,13 +174,15 @@ To use token aware routing with the driver, you must define your query in a very
 
 Here an example of how to query a sample schema using our driver facade.
 
-    CREATE TABLE test.sensor_data(
-        id int, 
-        year int, 
-        ts timestamp, 
-        data double,
-        PRIMARY KEY ((id, year), ts)
-    );
+```sql
+CREATE TABLE test.sensor_data(
+    id int, 
+    year int, 
+    ts timestamp, 
+    data double,
+    PRIMARY KEY ((id, year), ts)
+);
+```
 
 ```java
 DriverState driverState = driver.getActiveState();
