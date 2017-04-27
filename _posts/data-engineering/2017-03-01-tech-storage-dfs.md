@@ -7,7 +7,7 @@ categories: [data engineering, boxever]
 
 ## Technology, Storage and Data Format Choices
 
-This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture.
+This post is part of a [Series]({% post_url /data-engineering/2017-03-01-overview %}) on the Lambda Architecture. It was written in collaboration with [Boxever](http://www.boxever.com) and first posted on [Medium](https://medium.com/@BoxeverTech/etl-workflow-storage-data-formats-lambda-architecture-5f1b985ca955). 
 
 ### Overview
 
