@@ -9,21 +9,21 @@ categories: [hyper-parameter, bayesian optimization]
 
 ## Overview
 
-Global black-box optimisation is the problem of minimising an objective function over a configuration space. This objective function may be based in the physical phase or computational space. Typically, the objective function is not known and so it is a form of black box optimisation.
+Global black-box optimisation is the problem of minimising an objective function over a configuration space. This objective function may be based in the physical or computational space. Typically, the objective function is not known and so it is a form of black box optimisation.
 
-There are many optimisation problems where hyper-parameter optimisation is applicable. The term hyper-parameter is typically associated with a configurable model parameter in machine learning to distinguish it from standard model parameters which are automatically learned as part of the underlying model training. The tuning of these hyper-parameters can lead to large differences in the performance of a learning algorithm [4]. Even today, it is common to witness researcher's hand tuning all of their ML model parameters based on manual analysis after each optimisation attempt. The cross validation support in more modern ml package pipelines such as skit-learn have helped in directing users to attempt to automatically run multiple combinations of their experiment with different configurations to see if the outcome improves. However even then, many do not investigate if the underlying cross validation is selecting the configurations to sample based on any underlying intelligent search optimisation or simply grid or random search. As engineers and scientists this makes no sense and is ajar to the entire concept of machine learning which is intended to take the human out of the loop in either tedious or computationally intensive tasks.
+There are many optimisation problems where hyper-parameter tuning is applicable. The term hyper-parameter is typically associated with a configurable model parameter in machine learning to distinguish it from standard model parameters which are automatically learned as part of the underlying model training. The tuning of these hyper-parameters can lead to large differences in the performance of a learning algorithm [4]. Even today, it is common to witness researcher's hand tuning all of their ML model parameters based on manual analysis after each optimisation attempt. The cross validation support in more modern ml package pipelines such as skit-learn have helped in directing users to attempt to automatically run multiple combinations of their experiment with different configurations to see if the outcome improves. However even then, many do not investigate if the underlying cross validation is selecting the configurations to sample based on an intelligent search optimisation or simply grid or random search. As engineers and scientists this makes no sense and is ajar to the entire concept of machine learning which is intended to take the human out of the loop in either tedious or computationally intensive tasks.
 
 The methods involved in hyper-parameter optimisation however can be applied to any search space problem where we have a large number of degrees of freedom to search and a loss function to minimize (or maximize). As the title of the post suggests, the theory underlying hyper-parameter optimisation approaches have been derived from more general forms of research in the automated configuration of hard computational problems and is more generally called Global Optimisation.
 
 ## Challenges
 
-The manual exploration of the configuration search space by an expert is a time intensive problem. The exploitation of a successful configuration space is even more time consuming and is all but sometimes forgotten. Even with an expert winding their hours away at the problem, they still not be able to pick the optimal solution. When the number of hyper-parameters becomes large and interdependencies come into play, finding the optimal solution manually becomes less and less likely even for an expert in the domain. This leads to the need to formalise the search process so it can be systematically solved via a global optimisation method.
+The manual exploration of the configuration search space by an expert is a time intensive problem. The exploitation of a successful configuration space is even more time consuming and is all but sometimes forgotten. Even with an expert winding their hours away at the problem, they still may not be able to pick the optimal solution. When the number of hyper-parameters becomes large and interdependencies among them come into play, finding the optimal solution manually becomes less and less likely even for an expert in the domain. This leads to the need to formalise the search process so it can be systematically solved via a global optimisation method [4].
 
 ### Complex Search Space
 
 Where we only have one or two hyper-parameters with a handful of discrete domain values for each, the problem can be solved via naive approaches such as trialing every combination of configuration options (i.e. grid search). In fact for very low dimensionality spaces one should probably avoid more advanced methods as they are unlikely to yield any benefit. However when the search space involves even a handful of hyper-parameters with a large continuous domain, the number of combinations which must be run in order to have sampled the space effectively with a naive approach grows exponentially.
 
-Let's take two examples
+Let's take two examples. The first example has only two hyper-parameters
 
 $ A \in [0, 5, 10] \$ and $ B \in [1, 50] \$ gives,
 
@@ -33,7 +33,7 @@ Changing the domains of the parameters to, $ A \in [0:100] \$ and $ B \in [0.01:
 
 $ Combinations = C(A) \times C(B) = 100 \times 99 = 9900 \$
 
-Add in another hyper-parameter $ C \in [0:2] \$ with quantization of $ 0.01 \$ gives,
+If we add in another hyper-parameter $ C \in [0:2] \$ with quantization of $ 0.01 \$ it gives,
 
 $ Combinations = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 \$
 
@@ -41,7 +41,7 @@ More generally, if you have r variables, the $ i^{th} \$ of which can take on $ 
 
 $ \prod\limits_{i=1}^r n_i \$
 
-Hyper-parameters may be non-separable (i.e. are not additively decomposable). In fact it is highly likely that they are non-separable as that would imply they can be optimized separately.
+In addition to this, hyper-parameters may be non-separable (i.e. are not additively decomposable). In fact it is highly likely that they are non-separable as that would imply they can be optimized separately. Modelling these dependencies is a non trivial problem and the process of optimising such dependencies is not something humans can achieve past two or three parameters.
 
 ### Costly Objective Function
 
@@ -65,7 +65,7 @@ There are 4 main types of algorithms we will discuss in this blog post.
 
 * Grid Search
 * Random Search
-* Genetic Algorithms
+* Evolutionary Algorithms
 * SMBO
     * Bayesian
     * Tree Parzen Estimators
@@ -87,15 +87,15 @@ Of course there are ways to help both grid and random search with some domain kn
 
 As discussed grid search is intractable for all but the simplest of optimization problems. While random search appears to work quite well in practice, it can take a large number of samples to be reasonably confident that a solution close to the optimal has been found. It is also difficult to gain confidence that one is close to the optimal solution as there is never a visible convergence in the random search algorithm. It is worth noting however that random sampling is still used in some manner in all of the more sophisticated optimisation algorithms we will discuss in this post.
 
-### Simulated Annealing
+### Evolutionary
 
 Talk a little about simulated annealing.
 
-In this case one should an optimiser such as CMA-ES which stands for Covariance Matrix Adaptation Evolution Strategy. Evolution strategies (ES) are stochastic, derivative-free methods for numerical optimization of non-linear or non-convex continuous optimization problems [6]. CMA-ES is an optimisation approach which can be used independently of Gaussian Processes or another optimisation method. However, when used independently, it is recommended that preferably, no less than 100 times the dimension of the function evaluations be performed to get satisfactory results.
+Various types of Evolutionary Strategies exist such as CMA-ES which stands for Covariance Matrix Adaptation Evolution Strategy. Evolution strategies (ES) are stochastic, derivative-free methods for numerical optimization of non-linear or non-convex continuous optimization problems [6]. CMA-ES is an optimisation approach which can be used independently of Gaussian Processes or another optimisation method. It can dynamically adapt its search resolution per hyperparameter, allowing for efficient searches on different scales. However, when used independently, it is recommended that preferably, no less than 100 times the dimension of the function evaluations be performed to get satisfactory results. If we have tens or hundreds of hyper-parameters, this can be problematic.
 
 ### Sequential Model-Based Optimization
 
-Sequential Model-Based Global Optimization (SMBO) [4] algorithms use previous observations of the loss function (f), to determine the next (optimal) point to sample f for. Both Bayesian optimization and Tree of Parzen Estimators fall into this category.
+Sequential Model-Based Global Optimization (SMBO) [4] algorithms use previous observations of the loss function (f), to determine the next (optimal) point to sample f for. Both Bayesian optimization and Tree of Parzen Estimator fall into this category.
 
 The advantages of SMBO are that it [9]:
 
@@ -165,21 +165,18 @@ There are many libraries available for experimenting with Bayesian Optimisation 
 * [GpyOpt](https://github.com/SheffieldML/GPyOpt)
 * [MOE](https://github.com/Yelp/MOE)
 
-We have used [GpyOpt](https://github.com/SheffieldML/GPyOpt) extensively. It is an open source Bayesian Optimisation library built on top of [Gpy](https://github.com/SheffieldML/GPy) and is commercially friendly. Both libraries are produced by the University of Sheffield. It is a very nice library and we found its support for including constraint information in the domain space definition second to none (see [here](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_constrained_optimization.ipynb)). Its very well documented (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/tree/master/manual/) and [here](http://nbviewer.jupyter.org/github/SheffieldML/notebook/tree/master/GPy/)) and has a lot of options for the model and acquisition functions (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_models.ipynb)). They also have a Spearmint interface which allows running existing Spearmint processes by changing only a single line of code. We have not used Spearmint or BayesOpt due to their non commercial friendly license.
+We have used [GpyOpt](https://github.com/SheffieldML/GPyOpt) extensively. It is an open source Bayesian Optimisation library built on top of [Gpy](https://github.com/SheffieldML/GPy) and has a commercially friendly license. Both libraries are produced by the University of Sheffield. We found its support for including constraint information in the domain space definition second to none (see [here](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_constrained_optimization.ipynb)). Its very well documented (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/tree/master/manual/) and [here](http://nbviewer.jupyter.org/github/SheffieldML/notebook/tree/master/GPy/)) and has a lot of options for the model and acquisition functions (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_models.ipynb)). They also have a Spearmint interface which allows running existing Spearmint processes by changing only a single line of code. We have not used Spearmint or BayesOpt due to their non commercial friendly license.
 
-The theory behind Bayesian optimisation has been around for a long time. However it had some practical problems. In particular, the number of hyper-parameters for the Bayesian optimisation process itself. These are different from the hyper-parameters of the underlying optimization problem. They include the model type, kernel type (covariance function), the acquisition function, the acquisition function optimizer and associated variables such as exploration jitter. The most important of these are the covariance function parameters such as the length, variance and noise. Fortunately a fully bayesian treatment of the problem has been developed that marginalises over the bayesian hyper-parameters and computes the integrated acquisition function. This leads to an integrated acquisition function corresponding to a Monte Carlo integration over the individual acquisition functions of each GP, for which we use the expected improvement. The estimate of the optimal point at any step of the algorithm is given by the point of those queried with the maximum mean value in the GP posterior (with the hyperparameters marginalized out)
+The theory behind Bayesian optimisation has been around for a long time. However it had some practical problems. In particular, the number of hyper-parameters for the Bayesian optimisation process itself. These are different from the hyper-parameters of the underlying optimization problem. They include the model type, kernel type (covariance function), the acquisition function, the acquisition function optimizer and associated variables such as exploration jitter. The most important of these are the covariance function parameters such as the length, variance and noise. Fortunately a fully bayesian treatment of the problem has been developed that marginalises over the bayesian hyper-parameters and computes the integrated acquisition function. This leads to an integrated acquisition function corresponding to a Monte Carlo integration over the individual acquisition functions of each GP, for which we use the expected improvement. The estimate of the optimal point at any step of the algorithm is given by the point of those queried with the maximum mean value in the GP posterior (with the hyperparameters marginalized out).
 
 As choosing such an approach to integrating out the GP hyperparameters means choosing Expected Improvement as the acquisition function it reduces the number of choices one must make and the improves the automation of the optimization solution further. However, there are still variables such as kernel type and acquisition jitter which must be tuned and can have a large effect.
 
 While some Bayesian Optimisation libraries hide the complexities involved in the process almost completely, we have found that it is beneficial to spent some time studying the theory behind Bayesian Optimisation before trying to use it for hyper-parameter optimization. Using somewhat lower level libraries such as GPyOpt require one to be familiar with the theory discussed above in order to utilise the library efficiently. There are a number of commercial offerings arising and various high profile [purchases](https://techcrunch.com/2015/06/17/twitter-acquires-machine-learning-startup-whetlab/) of startups by the likes of Twitter in recent years. This demonstrates that using Bayesian Optimisation effectively is not a trivial matter. SigOpt itself was based on [MOE](https://github.com/Yelp/MOE) which was developed at Yelp to solve to optimise A/B testing. To provide you with an insight into the roots of SigOpt and why they started the company we have taken a snippet from [here](https://news.ycombinator.com/item?id=9101893)
 
-*"We are similar to hyperopt, spearmint, and MOE, which we developed at Yelp and also uses Gaussian Processes to do Bayesian Global Optimization. SigOpt extends and expands upon our work on MOE while wrapping everything in a simple API and web interface. One thing we learned while promoting MOE was that many people have this problem, but few have the time or expertise to get these expert level open source tools running properly, so we built SigOpt to bring these powerful tools to anyone via a simple API."*
+>"We are similar to hyperopt, spearmint, and MOE, which we developed at Yelp and also uses Gaussian Processes to do Bayesian Global Optimization. SigOpt extends and expands upon our work on MOE while wrapping everything in a simple API and web interface. One thing we learned while promoting MOE was that many people have this problem, but few have the time or expertise to get these expert level open source tools running properly, so we built SigOpt to bring these powerful tools to anyone via a simple API."
 
-Excellent tutorial [here](https://www.iro.umontreal.ca/~bengioy/cifar/NCAP2014-summerschool/slides/Ryan_adams_140814_bayesopt_ncap.pdf)
 
-Good free book on GPs [here](http://www.gaussianprocess.org/gpml/chapters/)
-
-#### Tree of Parzen Estimators
+#### Tree of Parzen Estimator
 Another form of SMBO algorithm is the Tree of Parzen Estimator (TPE). Whereas the Gaussian process based approach modeled $$ p(y|x) $$ directly, this strategy models $$ p(x|y) $$ and $$ p(y) $$ [4]. $$ P(x|y)P(x|y) $$ is modeled by transforming the generative process of hyperparameters, replacing the distributions of the configuration prior with non-parametric densities. The TPE algorithm scales linearly in the number of dimensions being optimised. Interestingly it uses CMA-ES to optimise the continuous hyper-parameters [4].
 
 [HyperOpt](http://hyperopt.github.io/hyperopt/) is a python implementation of the TPE algorithm by the author of TPE. It has support for defining conditional configuration spaces and even has support for distributed sampling. The distributed sampling part of the library feels a little stale and could be easier to use (e.g. the optimisation function code could be transmitted to the workers automatically instead of having to manually distributed and append the code to the path on the worker processes). However, all things considered it is a very nice library to use and easy to get up and going on custom problem domains within a couple of hours.
