@@ -25,25 +25,19 @@ Where we only have one or two hyper-parameters with a handful of discrete domain
 
 Let's take two examples
 
-* A e [0, 5, 10] and B e [1, 50]
+$ A \in [0, 5, 10] \$ and $ B \in [1, 50] \$ gives,
 
-This gives us
+$ Combinations = C(A) \times C(B) = 3 \times 2 = 6 \$
 
-C = C(A) * C(B) = 3 * 2 = 6
+Changing the domains of the parameters to, $ A \in [0:100] \$ and $ B \in [0.01:1] \$ with quantization of $ 1 \$ and $ 0.01 \$ respectively, gives,
 
-* A e [0:100] and B e [0.01:1] with quantization of 1 and 0.01 respectively
+$ Combinations = C(A) \times C(B) = 100 \times 99 = 9900 \$
 
-This gives us
+Add in another hyper-parameter $ C \in [0:2] \$ with quantization of $ 0.01 \$ gives,
 
-C = C(A) * C(B) = 100 *  99 = 9900
+$ Combinations = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 \$
 
-Add in another hyper-parameter C e [0:2] with quantization of 0.01 gives,
-
-C = C(A) * C(B) * C(B) = 100 *  99 * 200 = 1980000
-
-More formally
-
-Even more generally, if you have r variables, the $ i^{th} \$ of which can take on $ n_i \$ values, you will have
+More generally, if you have r variables, the $ i^{th} \$ of which can take on $ n_i \$ values, you will have
 
 $ \prod\limits_{i=1}^r n_i \$
 
