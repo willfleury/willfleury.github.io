@@ -25,19 +25,19 @@ Where we only have one or two hyper-parameters with a handful of discrete domain
 
 Let's take two examples. The first example has only two hyper-parameters
 
-$ A \in [0, 5, 10] \$ and $ B \in [1, 50] \$ gives,
+$ A \in [0, 5, 10] $ and $ B \in [1, 50] $ gives,
 
-$ Combinations = C(A) \times C(B) = 3 \times 2 = 6 \$
+$ Combinations = C(A) \times C(B) = 3 \times 2 = 6 $
 
 Changing the domains of the parameters to, $ A \in [0:100] \$ and $ B \in [0.01:1] \$ with quantization of $ 1 \$ and $ 0.01 \$ respectively, gives,
 
-$ Combinations = C(A) \times C(B) = 100 \times 99 = 9900 \$
+$ Combinations = C(A) \times C(B) = 100 \times 99 = 9900 $
 
-If we add in another hyper-parameter $ C \in [0:2] \$ with quantization of $ 0.01 \$ it gives,
+If we add in another hyper-parameter $ C \in [0:2] $ with quantization of $ 0.01 $ it gives,
 
-$ Combinations = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 \$
+$ Combinations = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 $
 
-More generally, if you have r variables, the $ i^{th} \$ of which can take on $ n_i \$ values, you will have $ \prod\limits_{i=1}^r n_i \$ combinations.
+More generally, if you have r variables, the $ i^{th} $ of which can take on $ n_i $ values, you will have $ \prod\limits_{i=1}^r n_i $ combinations.
 
 In addition to this, hyper-parameters may be non-separable (i.e. are not additively decomposable). In fact it is highly likely that they are non-separable as that would imply they can be optimized separately. Modelling these dependencies is a non trivial problem and the process of optimising such dependencies is not something humans can achieve past two or three parameters.
 
@@ -108,9 +108,15 @@ Gaussian Processes are typically chosen as the models for SMBO but other model t
 
 Bayesian optimization falls in the sequential model-based optimization (SMBO) class of algorithms. It has become a very popular field of research in the last number of years, even with a dedicated workshop at NIPS. Some commercial Bayesian Optimisation approaches such as [SigOpt](https://sigopt.com/) indicate that an optimal solution can be found within 20 to 30 times the dimensionality of the optimisation space. This is a very attractive proposition. There are conflicting views on the success of such approaches however the results are beginning to quell such discussions.
 
-Taking a formal definition from [11]. Let $f: {\mathcal X} \to R$ be a L-Lipschitz continuous function defined on a compact subset ${\mathcal X} \subseteq R^d$. We are interested in solving the global optimization problem of finding $$ x_{M} = \arg \min_{x \in {\mathcal X}} f(x). $$
+Taking a formal definition from [11]. Let $f: {\mathcal X} \to R$ be a L-Lipschitz continuous function defined on a compact subset ${\mathcal X} \subseteq R^d$. We are interested in solving the global optimization problem of finding
 
-We assume that $f$ is a black-box from which only perturbed evaluations of the type $y_i = f(x_i) + \epsilon_i$, with $\epsilon_i \sim\mathcal{N}(0,\psi^2)$, are available. The goal is to make a series of $x_1,\dots,x_N$ evaluations of $f$ such that the cumulative regret $$r_N= Nf(x_{M})- \sum_{n=1}^N f(x_n),$$ is minimized. Essentially, $r_N$ is minimized if we start evaluating $f$ at $x_{M}$ as soon as possible.
+$$ x_{M} = \arg \min_{x \in {\mathcal X}} f(x). $$
+
+We assume that $f$ is a black-box from which only perturbed evaluations of the type $y_i = f(x_i) + \epsilon_i$, with $\epsilon_i \sim\mathcal{N}(0,\psi^2)$, are available. The goal is to make a series of $x_1,\dots,x_N$ evaluations of $f$ such that the cumulative regret
+
+$$r_N= Nf(x_{M})- \sum_{n=1}^N f(x_n)$$
+
+is minimized. Essentially, $r_N$ is minimized if we start evaluating $f$ at $x_{M}$ as soon as possible.
 
 There are two crucial bits in any Bayesian Optimization (BO) procedure approach.
 
