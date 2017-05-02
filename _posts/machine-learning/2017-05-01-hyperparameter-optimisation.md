@@ -37,9 +37,7 @@ If we add in another hyper-parameter $ C \in [0:2] \$ with quantization of $ 0.0
 
 $ Combinations = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 \$
 
-More generally, if you have r variables, the $ i^{th} \$ of which can take on $ n_i \$ values, you will have
-
-$ \prod\limits_{i=1}^r n_i \$
+More generally, if you have r variables, the $ i^{th} \$ of which can take on $ n_i \$ values, you will have $ \prod\limits_{i=1}^r n_i \$ combinations.
 
 In addition to this, hyper-parameters may be non-separable (i.e. are not additively decomposable). In fact it is highly likely that they are non-separable as that would imply they can be optimized separately. Modelling these dependencies is a non trivial problem and the process of optimising such dependencies is not something humans can achieve past two or three parameters.
 
