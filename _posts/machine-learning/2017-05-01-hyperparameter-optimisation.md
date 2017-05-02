@@ -100,11 +100,8 @@ Sequential Model-Based Global Optimization (SMBO) [4] algorithms use previous ob
 The advantages of SMBO are that it [9]:
 
 * leverages smoothness without analytic gradient
-
 * handles real-valued, discrete, and conditional variables
-
 * handles parallel evaluations of f(x)
-
 * copes with hundreds of variables, even with budget of just a few hundred function evaluations
 
 Gaussian Processes are typically chosen as the models for SMBO but other model types can be chosen such as random forests which are used in the SMAC algorithm [12]. We discuss only Bayesian Optimization and TPE in this post.
@@ -127,11 +124,11 @@ Every time a new data point is collected. The model is re-estimated and the acqu
 
 Gaussian processes are used as the models in Bayesian Optimisation. The best description of what a Gaussian Process (GP) is and why it is useful is in from the book "Gaussian Processes for Machine Learning.", MIT Press, 2006.
 
-*"A Gaussian process is a generalization of the Gaussian probability distribution. Whereas a probability distribution describes random variables which are scalars or vectors (for multivariate distributions), a stochastic process governs the properties of functions. Leaving mathematical sophistication aside, one can loosely think of a function as a very long vector, each entry in the vector specifying the function value f(x) at a particular input x. *
+>"A Gaussian process is a generalization of the Gaussian probability distribution. Whereas a probability distribution describes random variables which are scalars or vectors (for multivariate distributions), a stochastic process governs the properties of functions. Leaving mathematical sophistication aside, one can loosely think of a function as a very long vector, each entry in the vector specifying the function value f(x) at a particular input x.
 
-*It turns out, that although this idea is a little naive, it is surprisingly close what we need. Indeed, the question of how we deal computationally with these infinite dimensional objects has the most pleasant resolution imaginable: if you ask only for the properties of the function at a finite number of points, then inference in the Gaussian process will give you the same answer if you ignore the infinitely many other points, as if you would have taken them all into account! And these answers are consistent with answers to any other finite queries you may have. *
+>"It turns out, that although this idea is a little naive, it is surprisingly close what we need. Indeed, the question of how we deal computationally with these infinite dimensional objects has the most pleasant resolution imaginable: if you ask only for the properties of the function at a finite number of points, then inference in the Gaussian process will give you the same answer if you ignore the infinitely many other points, as if you would have taken them all into account! And these answers are consistent with answers to any other finite queries you may have. "
 
-*One of the main attractions of the Gaussian process framework is precisely that it unites a sophisticated and consistent view with computational tractability." *
+>"One of the main attractions of the Gaussian process framework is precisely that it unites a sophisticated and consistent view with computational tractability."
 
 Gaussian processes allow us to follow two different types of behaviour - exploitation (sample close to good values we already know) and exploration (sample areas we know relatively little about in case they are better). There are many choices for the covariance functions (kernels) of the GPs including:
 
