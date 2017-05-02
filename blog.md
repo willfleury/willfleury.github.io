@@ -17,3 +17,5 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 * [Querying & Merging Views]({% post_url /data-engineering/2017-03-01-merge-serving-views %})
 
 
+### Machine Learning
+* [Global Black-Box Optimization applied to Hyper-parameter Tuning]({% post_url /machine-learning/2017-05-01-hyperparameter-optimisation %})
