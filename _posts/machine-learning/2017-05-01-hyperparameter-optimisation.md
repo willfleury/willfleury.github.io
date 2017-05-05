@@ -70,9 +70,10 @@ There are 4 main types of algorithms we will discuss in this blog post.
 
 There are a number optimization libraries which allow one to test a variety of these optimisation algorithms and some others which we don’t specifically mention here (such as Particle Swarm Optimisation). [Optunity](http://optunity.readthedocs.io/en/latest/user/index.html) is an example of such a library. While we have not used this library, it appears to provide an elegant and common interface over a variety of hyper-parameter optimisation approaches (what it calls solvers).
 
+
 ### Grid & Random Search
 
-To summarise (plagiarize) the conclusion in [7].  Grid search experiments are common in the literature of empirical machine learning, where they are used to optimize the hyper-parameters of learning algorithms. It is also common to perform multistage, multi-resolution grid experiments that are more or less automated, because a grid experiment with a fine-enough resolution for optimization would be prohibitively expensive. We have shown that random experiments are more efficient than grid experiments for hyper-parameter optimization in the case of several learning algorithms on several data sets. Our analysis of the hyper-parameter response surface (Ψ) suggests that random experiments are more efficient because not all hyperparameters are equally important to tune. Grid search experiments allocate too many trials to the exploration of dimensions that do not matter and suffer from poor coverage in dimensions that are important. Compared with the grid search experiments of Larochelle et al. (2007) [8], random search found better models in most cases and required less computational time. Random experiments are also easier to carry out than grid experiments for practical reasons related to the statistical independence of every trial.
+To summarise (plagiarize) the conclusion in [4].  Grid search experiments are common in the literature of empirical machine learning, where they are used to optimize the hyper-parameters of learning algorithms. It is also common to perform multistage, multi-resolution grid experiments that are more or less automated, because a grid experiment with a fine-enough resolution for optimization would be prohibitively expensive. We have shown that random experiments are more efficient than grid experiments for hyper-parameter optimization in the case of several learning algorithms on several data sets. Our analysis of the hyper-parameter response surface (Ψ) suggests that random experiments are more efficient because not all hyperparameters are equally important to tune. Grid search experiments allocate too many trials to the exploration of dimensions that do not matter and suffer from poor coverage in dimensions that are important. Compared with the grid search experiments of Larochelle et al. (2007) [7], random search found better models in most cases and required less computational time. Random experiments are also easier to carry out than grid experiments for practical reasons related to the statistical independence of every trial.
 
 * The experiment can be stopped any time and the trials form a complete experiment.
 * If extra computers become available, new trials can be added to an experiment without having to adjust the grid and commit to a much larger experiment.
@@ -83,32 +84,35 @@ To summarise (plagiarize) the conclusion in [7].  Grid search experiments are co
 
 Of course there are ways to help both grid and random search with some domain knowledge such as quantising the hyper-parameters to reduce the search space (not the number of dimension).
 
-As discussed grid search is intractable for all but the simplest of optimization problems. While random search appears to work quite well in practice, it can take a large number of samples to be reasonably confident that a solution close to the optimal has been found. It is also difficult to gain confidence that one is close to the optimal solution as there is never a visible convergence in the random search algorithm. It is worth noting however that random sampling is still used in some manner in all of the more sophisticated optimisation algorithms we will discuss in this post.
+As discussed grid search is intractable for all but the simplest of optimization problems. While random search appears to work quite well in practice, it can take a large number of samples to be reasonably confident that a solution close to the optimal has been found. It is also difficult to gain confidence that one is close to the optimal solution as there is never a visible convergence in the random search algorithm. It is however worth noting, that random sampling is still used in some manner in all of the more sophisticated optimisation algorithms we will discuss in this post.
+
 
 ### Evolutionary Algorithms
 
-Talk a little about simulated annealing.
+There are many forms of evolutionary algorithms from Genetic Algorithms (GA) to Evolutionary Strategies (ES). A GA is an algorithm that is based on natural selection, the process that drives biological evolution. While GAs were very popular in the late 90's and early 2000's, they have been superseded by a range of new optimisation algorithms, some of which we discuss in this post. One of the earlier algorithms to succeed GAs was Particle Swarm Optimization (PSO).  While PSO and GAs are not the same, they do share some characteristics such as the fact that they are both population-based search algorithms. However, PSO has been shown to perform as well as GA but require fewer evaluations [13].
 
-Various types of Evolutionary Strategies exist such as CMA-ES which stands for Covariance Matrix Adaptation Evolution Strategy. Evolution strategies (ES) are stochastic, derivative-free methods for numerical optimization of non-linear or non-convex continuous optimization problems [6]. CMA-ES is an optimisation approach which can be used independently of Gaussian Processes or another optimisation method. It can dynamically adapt its search resolution per hyperparameter, allowing for efficient searches on different scales. However, when used independently, it is recommended that preferably, no less than 100 times the dimension of the function evaluations be performed to get satisfactory results. If we have tens or hundreds of hyper-parameters, this can be problematic.
+GAs are characterised by a binary string representation of candidate solutions. Evolutionary Strategies on the other hand use vectors of real valued numbers as the representation. Various types of Evolutionary Strategies exist such as CMA-ES which stands for Covariance Matrix Adaptation Evolution Strategy. Evolution strategies (ES) are stochastic, derivative-free methods for numerical optimization of non-linear or non-convex continuous optimization problems [6]. CMA-ES is an optimisation approach which can be used independently of Gaussian Processes or another optimisation method. It can dynamically adapt its search resolution per hyperparameter, allowing for efficient searches on different scales. When used independently, it is recommended that preferably, no less than 100 times the dimension of the function evaluations be performed to get satisfactory results. If we have tens or hundreds of hyper-parameters, this can be problematic.
+
 
 ### Sequential Model-Based Optimization
 
 Sequential Model-Based Global Optimization (SMBO) [4] algorithms use previous observations of the loss function (f), to determine the next (optimal) point to sample f for. Both Bayesian optimization and Tree of Parzen Estimator fall into this category.
 
-The advantages of SMBO are that it [9]:
+The advantages of SMBO are that it [8]:
 
 * leverages smoothness without analytic gradient
 * handles real-valued, discrete, and conditional variables
 * handles parallel evaluations of f(x)
 * copes with hundreds of variables, even with budget of just a few hundred function evaluations
 
-Gaussian Processes are typically chosen as the models for SMBO but other model types can be chosen such as random forests which are used in the SMAC algorithm [12]. We discuss only Bayesian Optimization and TPE in this post.
+Gaussian Processes are typically chosen as the models for SMBO but other model types can be chosen such as random forests which are used in the SMAC algorithm [11]. We discuss only Bayesian Optimization and TPE in this post.
+
 
 #### Bayesian Optimization
 
-Bayesian optimization falls in the sequential model-based optimization (SMBO) class of algorithms. It has become a very popular field of research in the last number of years, even with a dedicated workshop at NIPS. Some commercial Bayesian Optimisation approaches such as [SigOpt](https://sigopt.com/) indicate that an optimal solution can be found within 20 to 30 times the dimensionality of the optimisation space. This is a very attractive proposition. There are conflicting views on the success of such approaches however the results are beginning to quell such discussions.
+Bayesian optimization falls in the sequential model-based optimization (SMBO) class of algorithms. It has become a very popular field of research in the last number of years, even with a dedicated workshop at NIPS. Some commercial Bayesian Optimisation approaches such as [SigOpt](https://sigopt.com/) indicate that an optimal solution can be found within 20 to 30 times the dimensionality of the optimisation space. This is a very attractive proposition. There are conflicting views on the success of such approaches, but the results are beginning to quell such discussions.
 
-Taking a formal definition from [11]. Let $f: {\mathcal X} \to R$ be a L-Lipschitz continuous function defined on a compact subset ${\mathcal X} \subseteq R^d$. We are interested in solving the global optimization problem of finding
+Taking a formal definition from [10]. Let $f: {\mathcal X} \to R$ be a L-Lipschitz continuous function defined on a compact subset ${\mathcal X} \subseteq R^d$. We are interested in solving the global optimization problem of finding
 
 $$ x_{M} = \arg \min_{x \in {\mathcal X}} f(x). $$
 
@@ -126,7 +130,7 @@ Define an acquisition function $acqu(x)$: this is a criteria to decide where to 
 
 Every time a new data point is collected. The model is re-estimated and the acquisition function optimized again until convergence. Given a prior over the function $f$ and an acquisition function, a BO procedure will converge to the optimum of $f$ under some conditions (Bull, 2011).
 
-Gaussian processes are used as the models in Bayesian Optimisation. The best description of what a Gaussian Process (GP) is and why it is useful is in from the book "Gaussian Processes for Machine Learning" [14].
+Gaussian processes are used as the models in Bayesian Optimisation. The best description of what a Gaussian Process (GP) is and why it is useful is in from the book "Gaussian Processes for Machine Learning" [12].
 
 >"A Gaussian process is a generalization of the Gaussian probability distribution. Whereas a probability distribution describes random variables which are scalars or vectors (for multivariate distributions), a stochastic process governs the properties of functions. Leaving mathematical sophistication aside, one can loosely think of a function as a very long vector, each entry in the vector specifying the function value f(x) at a particular input x.
 
@@ -159,7 +163,7 @@ On top of that there can be varying types of acquisition function optimizers whi
 * DIRECT
 * CMA
 
-Note that the Limited Memory BGFS (L-BGFS) is designed to work on smooth convex functions. In fact, objective functions are preferably twice differentiable to use L-BGFS effectively however a locally Lipschitz function is usually sufficient [10]. Note that one can use the Matern 5/2 kernel with Automatic Relevance Determination (ARD) to support a non smooth underlying function being estimated but still be twice differentiable. The standard Radial Basis Function (RBF), aka Gaussian Function has smoothness assumptions that can be excessive for some objectives. It is worth noting that TPE uses CMA-ES for optimizing the acquisition function.
+Note that the Limited Memory BGFS (L-BGFS) is designed to work on smooth convex functions. In fact, objective functions are preferably twice differentiable to use L-BGFS effectively, however a locally Lipschitz function is usually sufficient [9]. Note that one can use the Matern 5/2 kernel with Automatic Relevance Determination (ARD) to support a non smooth underlying function being estimated but still be twice differentiable. The standard Radial Basis Function (RBF), aka Gaussian Function has smoothness assumptions that can be excessive for some objectives. It is worth noting that TPE uses CMA-ES for optimizing the acquisition function.
 
 There are many libraries available for experimenting with Bayesian Optimisation including (but not limited to)
 
@@ -171,7 +175,7 @@ There are many libraries available for experimenting with Bayesian Optimisation 
 
 We have used [GpyOpt](https://github.com/SheffieldML/GPyOpt) extensively. It is an open source Bayesian Optimisation library built on top of [Gpy](https://github.com/SheffieldML/GPy) and has a commercially friendly license. Both libraries are produced by the University of Sheffield. We found its support for including constraint information in the domain space definition second to none (see [here](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_constrained_optimization.ipynb)). Its very well documented (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/tree/master/manual/) and [here](http://nbviewer.jupyter.org/github/SheffieldML/notebook/tree/master/GPy/)) and has a lot of options for the model and acquisition functions (see [here](http://nbviewer.jupyter.org/github/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_models.ipynb)). They also have a Spearmint interface which allows running existing Spearmint processes by changing only a single line of code. We have not used Spearmint or BayesOpt due to their non commercial friendly license.
 
-The theory behind Bayesian optimisation has been around for a long time. However it had some practical problems. In particular, the number of hyper-parameters for the Bayesian optimisation process itself. These are different from the hyper-parameters of the underlying optimization problem. They include the model type, kernel type (covariance function), the acquisition function, the acquisition function optimizer and associated variables such as exploration jitter. The most important of these are the covariance function parameters such as the length, variance and noise. Fortunately a fully bayesian treatment of the problem has been developed that marginalises over the bayesian hyper-parameters and computes the integrated acquisition function. This leads to an integrated acquisition function corresponding to a Monte Carlo integration over the individual acquisition functions of each GP, for which we use the expected improvement. The estimate of the optimal point at any step of the algorithm is given by the point of those queried with the maximum mean value in the GP posterior (with the hyperparameters marginalized out).
+The theory behind Bayesian optimisation has been around for a long time. However, it had some practical problems. In particular, the number of hyper-parameters for the Bayesian optimisation process itself. These are different from the hyper-parameters of the underlying optimization problem. They include the model type, kernel type (covariance function), the acquisition function, the acquisition function optimizer and associated variables such as exploration jitter. The most important of these are the covariance function parameters such as the length, variance and noise. Fortunately a fully bayesian treatment of the problem has been developed that marginalises over the bayesian hyper-parameters and computes the integrated acquisition function. This leads to an integrated acquisition function corresponding to a Monte Carlo integration over the individual acquisition functions of each GP, for which we use the expected improvement. The estimate of the optimal point at any step of the algorithm is given by the point of those queried with the maximum mean value in the GP posterior (with the hyperparameters marginalized out).
 
 As choosing such an approach to integrating out the GP hyperparameters means choosing Expected Improvement as the acquisition function it reduces the number of choices one must make and the improves the automation of the optimization solution further. However, there are still variables such as kernel type and acquisition jitter which must be tuned and can have a large effect.
 
@@ -205,7 +209,7 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[2]](https://www.cs.ubc.ca/~hutter/papers/10-TR-SMAC.pdf) F. Hutter, H. Hoos, and K. Leyton-Brown. Sequential model-based optimization for general algorithm configuration. In LION-5, 2011. Extended version as UBC Tech report TR-2010-10.
 
-[3] Bergstra and Bengio 2012.
+[3] (http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1 (2012): 281-305
 
 [[4]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf) Bergstra, James S., et al. "Algorithms for hyper-parameter optimization." Advances in Neural Information Processing Systems. 2011.
 
@@ -213,18 +217,16 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[6]](https://en.wikipedia.org/wiki/CMA-ES) N. Hansen. The CMA evolution strategy: a comparing review. In J.A. Lozano, P. Larranaga, I. Inza, and E. Bengoetxea, editors, Towards a new evolutionary computation. Advances on estimation of distribution algorithms, pages 75–102. Springer, 2006.
 
-[[7]](http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1 (2012): 281-305
+[7] Larochelle, D. Erhan, A. Courville, J. Bergstra, and Y. Bengio. An empirical evaluation of deep architectures on problems with many factors of variation. ICML’07, pages 473–480. ACM, 2007.
 
-[8] Larochelle, D. Erhan, A. Courville, J. Bergstra, and Y. Bengio. An empirical evaluation of deep architectures on problems with many factors of variation. ICML’07, pages 473–480. ACM, 2007.
+[[8]](http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014008/meta) James Bergstra et al 2015 Computational. Science & Discovery Vol 8
 
-[[9]](http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014008/meta) James Bergstra et al 2015 Computational. Science & Discovery Vol 8
+[[9]](https://www.cs.nyu.edu/overton/papers/pdffiles/bfgs_inexactLS.pdf) Lewis, A.S., Overton, M.L.: Nonsmooth optimization via BFGS, 2008
 
-[[10]](https://www.cs.nyu.edu/overton/papers/pdffiles/bfgs_inexactLS.pdf) Lewis, A.S., Overton, M.L.: Nonsmooth optimization via BFGS, 2008
+[[10]](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb) [https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb)
 
-[[11]](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb) [https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb)
+[[11] http://www.cs.ubc.ca/labs/beta/Projects/SMAC/](http://www.cs.ubc.ca/labs/beta/Projects/SMAC/)
 
-[[12] http://www.cs.ubc.ca/labs/beta/Projects/SMAC/](http://www.cs.ubc.ca/labs/beta/Projects/SMAC/)
+[[12]](http://www.gaussianprocess.org/gpml/) Gaussian Processes for Machine Learning. Carl Edward Rasmussen and Christopher K. I. Williams. The MIT Press, 2006
 
-[[13]](https://arxiv.org/pdf/1206.2944.pdf) Practical Bayesian Optimization of Machine Learning Algorithms. Jasper Snoek, Hugo Larochelle and Ryan P. Adams. *Advances in Neural Information Processing Systems*, 2012
-
-[[14]](http://www.gaussianprocess.org/gpml/) Gaussian Processes for Machine Learning. Carl Edward Rasmussen and Christopher K. I. Williams. The MIT Press, 2006
+[13] Rania Hassan, Babak Cohanim Olivier de Weck. A Comparison of Particle Swarm Optimization and the Genetic Algorithm, 2005
