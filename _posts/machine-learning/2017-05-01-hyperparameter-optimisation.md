@@ -85,7 +85,7 @@ Of course there are ways to help both grid and random search with some domain kn
 
 As discussed grid search is intractable for all but the simplest of optimization problems. While random search appears to work quite well in practice, it can take a large number of samples to be reasonably confident that a solution close to the optimal has been found. It is also difficult to gain confidence that one is close to the optimal solution as there is never a visible convergence in the random search algorithm. It is worth noting however that random sampling is still used in some manner in all of the more sophisticated optimisation algorithms we will discuss in this post.
 
-### Evolutionary
+### Evolutionary Algorithms
 
 Talk a little about simulated annealing.
 
@@ -126,7 +126,7 @@ Define an acquisition function $acqu(x)$: this is a criteria to decide where to 
 
 Every time a new data point is collected. The model is re-estimated and the acquisition function optimized again until convergence. Given a prior over the function $f$ and an acquisition function, a BO procedure will converge to the optimum of $f$ under some conditions (Bull, 2011).
 
-Gaussian processes are used as the models in Bayesian Optimisation. The best description of what a Gaussian Process (GP) is and why it is useful is in from the book "Gaussian Processes for Machine Learning.", MIT Press, 2006.
+Gaussian processes are used as the models in Bayesian Optimisation. The best description of what a Gaussian Process (GP) is and why it is useful is in from the book "Gaussian Processes for Machine Learning" [14].
 
 >"A Gaussian process is a generalization of the Gaussian probability distribution. Whereas a probability distribution describes random variables which are scalars or vectors (for multivariate distributions), a stochastic process governs the properties of functions. Leaving mathematical sophistication aside, one can loosely think of a function as a very long vector, each entry in the vector specifying the function value f(x) at a particular input x.
 
@@ -227,3 +227,4 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[13]](https://arxiv.org/pdf/1206.2944.pdf) Practical Bayesian Optimization of Machine Learning Algorithms. Jasper Snoek, Hugo Larochelle and Ryan P. Adams. *Advances in Neural Information Processing Systems*, 2012
 
+[[14]](http://www.gaussianprocess.org/gpml/) Gaussian Processes for Machine Learning. Carl Edward Rasmussen and Christopher K. I. Williams. The MIT Press, 2006
