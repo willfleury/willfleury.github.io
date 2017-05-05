@@ -1,3 +1,12 @@
 theme: jekyll-theme-cayman
-title: Will Fleury
+title: Will Fleury, PhD
 description: Data Engineer, Data Architect, Machine Learning Practitioner
+markdown: kramdown
+
+author: Will Fleury
+
+future: true
+
+gems:
+  - jekyll-seo-tag
+  - jekyll-sitemap
