@@ -185,7 +185,7 @@ Another form of SMBO algorithm is the Tree of Parzen Estimator (TPE). Whereas th
 
 [HyperOpt](http://hyperopt.github.io/hyperopt/) is a python implementation of the TPE algorithm by the author of TPE. It has support for defining conditional configuration spaces and even has support for distributed sampling. The distributed sampling part of the library feels a little stale and could be easier to use (e.g. the optimisation function code could be transmitted to the workers automatically instead of having to manually distributed and append the code to the path on the worker processes). However, all things considered it is a very nice library to use and easy to get up and going on custom problem domains within a couple of hours.
 
-We have found the TPE algorithm to be a simple and very effective optimisation method to obtain competitive results on a variety of problems. It requires slightly more evaluations than Bayesian Optimisation while being very simple to setup and obtain results with than Bayesian Optimisation.
+We have found the TPE algorithm to be a simple and very effective optimisation method to obtain competitive results on a variety of problems. It requires slightly more evaluations than Bayesian Optimisation but is much easier to start working with.
 
 ### Conclusion
 
@@ -195,17 +195,11 @@ Hyper-parameter optimization does not free you from the traps associated with ma
 
 ## Visualising Optimisation
 
-As with every problem, it is useful to visualise the progress and results in an intuitive manner. Some hyper-parameter optimisation methods lend themselves well to visualising optimisation results while others do not. Random search for example will not allow one to visualise any discernable pattern in the progress of the optimisation. However, SMBO algorithms such Bayesian, TPE have properties that mean a convergence towards a global optimum should be plottable. In fact if a convergence is not visualised with these methods it can mean that it has not found a suitable configuration to exploit and may either require more evaluations or another tweak.
+As with every problem, it is useful to visualise the progress and results in an intuitive manner. Some hyper-parameter optimisation methods lend themselves well to visualising optimisation results while others do not. Random search for example will not allow one to visualise any discernible pattern in the progress of the optimisation. However, SMBO algorithms such Bayesian, TPE have properties that mean a convergence towards a global optimum should be plottable. In fact, if a convergence is not visualised with these methods it can mean that it has not found a suitable configuration to exploit and may either require more evaluations or another tweak.
 
-Two plots we have found particularly useful for visualising the performance / convergence as scatter plots with the associated kernel density estimate distribution plot.
+Two plots we have found particularly useful for visualising the performance / convergence are scatter plots with the associated kernel density estimate distribution plot for the given hyper-parameter. Again, depending on the optimisation algorithm employed, there may be varying patterns in this convergence. Similarly, there may be random samples and what appear to be resets where a convergence is found but the algorithm then attempts to sample outside of this space (i.e. exploration).
 
-Below is an example of these plots when used with the TPE algorithm discussed above. The patterns are easy to discern in the scatter plot with the lower values being the most rewarding. Similarly in the KDE plot it is clear that in the final 50 trials the algorithm focused more narrowly on the higher reward part of the domain.
-
-{% include image.html img="/assets/images/machine-learning/hyperparameter_image_2.png" title="Grid vs Random Search" caption="Grid vs Random Search" %}
-
-{% include image.html img="/assets/images/machine-learning/hyperparameter_image_3.png" title="Grid vs Random Search" caption="Grid vs Random Search" %}
-
-Visualise with scatter plots and distribution plots. Examples shown below
+{% include image.html img="/assets/images/machine-learning/hyperparameter_image_2.png" title="Configuration Convergence" caption="Configuration Convergence" %}
 
 [[1]](https://www.cs.ubc.ca/~hutter/papers/Hutter09PhD.pdf) F. Hutter. Automated Configuration of Algorithms for Solving Hard Computational Problems. PhD thesis, University of British Columbia, 2009.
 
