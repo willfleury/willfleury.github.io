@@ -209,7 +209,7 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[2]](https://www.cs.ubc.ca/~hutter/papers/10-TR-SMAC.pdf) F. Hutter, H. Hoos, and K. Leyton-Brown. Sequential model-based optimization for general algorithm configuration. In LION-5, 2011. Extended version as UBC Tech report TR-2010-10.
 
-[3] (http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1 (2012): 281-305
+[[3]](http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1 (2012): 281-305
 
 [[4]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf) Bergstra, James S., et al. "Algorithms for hyper-parameter optimization." Advances in Neural Information Processing Systems. 2011.
 
@@ -223,12 +223,12 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[9]](https://www.cs.nyu.edu/overton/papers/pdffiles/bfgs_inexactLS.pdf) Lewis, A.S., Overton, M.L.: Nonsmooth optimization via BFGS, 2008
 
-[[10]](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb) [https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb)
+[[10]](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb) https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb
 
-[[11] http://www.cs.ubc.ca/labs/beta/Projects/SMAC/](http://www.cs.ubc.ca/labs/beta/Projects/SMAC/)
+[[11]](http://www.cs.ubc.ca/labs/beta/Projects/SMAC/) http://www.cs.ubc.ca/labs/beta/Projects/SMAC/
 
 [[12]](http://www.gaussianprocess.org/gpml/) Gaussian Processes for Machine Learning. Carl Edward Rasmussen and Christopher K. I. Williams. The MIT Press, 2006
 
-[13] Rania Hassan, Babak Cohanim Olivier de Weck. A Comparison of Particle Swarm Optimization and the Genetic Algorithm, 2005
+[13] Rania Hassan, Babak Cohanim, Olivier de Weck. A Comparison of Particle Swarm Optimization and the Genetic Algorithm, 2005
 
 [14] Adam D. Bull. Convergence rates of efficient global optimization algorithms. JMLR, (3-4):2879–2904, 2011
