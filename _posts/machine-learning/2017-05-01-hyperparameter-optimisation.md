@@ -205,28 +205,28 @@ Two plots we have found particularly useful for visualising the performance / co
 
 [[1]](https://www.cs.ubc.ca/~hutter/papers/Hutter09PhD.pdf) F. Hutter. Automated Configuration of Algorithms for Solving Hard Computational Problems. PhD thesis, University of British Columbia, 2009.
 
-[[2]](https://www.cs.ubc.ca/~hutter/papers/10-TR-SMAC.pdf) F. Hutter, H. Hoos, and K. Leyton-Brown. Sequential model-based optimization for general algorithm configuration. In LION-5, 2011. Extended version as UBC Tech report TR-2010-10.
+[[2]](https://www.cs.ubc.ca/~hutter/papers/10-TR-SMAC.pdf) F. Hutter, H. Hoos, and K. Leyton-Brown. Sequential model-based optimization for general algorithm configuration. LION-5, 2011. 
 
-[[3]](http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1 (2012): 281-305
+[[3]](http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) Bergstra, James, and Yoshua Bengio. Random search for hyper-parameter optimization. The Journal of Machine Learning Research 13.1, 2012.
 
-[[4]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf) Bergstra, James S., et al. "Algorithms for hyper-parameter optimization." Advances in Neural Information Processing Systems. 2011.
+[[4]](https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf) Bergstra, James S., et al. Algorithms for hyper-parameter optimization. Advances in Neural Information Processing Systems, 2011.
 
-[[5]](https://link.springer.com/chapter/10.1007%2F3-540-07165-2_55) Močkus J. (1975) On bayesian methods for seeking the extremum. In: Marchuk G.I. (eds) Optimization Techniques IFIP Technical Conference Novosibirsk, July 1–7, 1974. Optimization Techniques 1974. Lecture Notes in Computer Science, vol 27. Springer, Berlin, Heidelberg
+[[5]](https://link.springer.com/chapter/10.1007%2F3-540-07165-2_55) Močkus J. On bayesian methods for seeking the extremum. Optimization Techniques IFIP Technical Conference Novosibirsk, 1974. 
 
-[[6]](https://en.wikipedia.org/wiki/CMA-ES) N. Hansen. The CMA evolution strategy: a comparing review. In J.A. Lozano, P. Larranaga, I. Inza, and E. Bengoetxea, editors, Towards a new evolutionary computation. Advances on estimation of distribution algorithms, pages 75–102. Springer, 2006.
+[[6]](https://en.wikipedia.org/wiki/CMA-ES) N. Hansen. The CMA evolution strategy: a comparing review. In J.A. Lozano, P. Larranaga, I. Inza, and E. Bengoetxea, editors, Towards a new evolutionary computation. Advances on estimation of distribution algorithms, pages 75–102. Springer, 202006.
 
 [7] Larochelle, D. Erhan, A. Courville, J. Bergstra, and Y. Bengio. An empirical evaluation of deep architectures on problems with many factors of variation. ICML’07, pages 473–480. ACM, 2007.
 
-[[8]](http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014008/meta) James Bergstra et al 2015 Computational. Science & Discovery Vol 8
+[[8]](http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014008/meta) James Bergstra et al. Computational Science & Discovery Vol 8, 2015.
 
-[[9]](https://www.cs.nyu.edu/overton/papers/pdffiles/bfgs_inexactLS.pdf) Lewis, A.S., Overton, M.L.: Nonsmooth optimization via BFGS, 2008
+[[9]](https://www.cs.nyu.edu/overton/papers/pdffiles/bfgs_inexactLS.pdf) Lewis, A.S., Overton, M.L. Nonsmooth optimization via BFGS, 2008.
 
 [[10]](https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb) https://github.com/SheffieldML/GPyOpt/blob/master/manual/GPyOpt_reference_manual.ipynb
 
 [[11]](http://www.cs.ubc.ca/labs/beta/Projects/SMAC/) http://www.cs.ubc.ca/labs/beta/Projects/SMAC/
 
-[[12]](http://www.gaussianprocess.org/gpml/) Gaussian Processes for Machine Learning. Carl Edward Rasmussen and Christopher K. I. Williams. The MIT Press, 2006
+[[12]](http://www.gaussianprocess.org/gpml/) Carl Edward Rasmussen and Christopher K. I. Williams. Gaussian Processes for Machine Learning. The MIT Press, 2006.
 
-[13] Rania Hassan, Babak Cohanim, Olivier de Weck. A Comparison of Particle Swarm Optimization and the Genetic Algorithm, 2005
+[13] Rania Hassan, Babak Cohanim, Olivier de Weck. A Comparison of Particle Swarm Optimization and the Genetic Algorithm, 2005.
 
-[[14]](https://arxiv.org/abs/1101.3501) Adam D. Bull. Convergence rates of efficient global optimization algorithms. JMLR, (3-4):2879–2904, 2011
+[[14]](https://arxiv.org/abs/1101.3501) Adam D. Bull. Convergence rates of efficient global optimization algorithms. JMLR, 2011.
