@@ -18,7 +18,7 @@ Data Engineering
 Machine Learning
 
 * Deep Learning (I started with MLPs long before Deep Learning became the go to architecture)
-* Dimensionality Reduction (using Generative Models in particular)
+* Generative Models
 * Hyperparameter Optimisation
 * Various other ML problems from classification to forecasting
 
