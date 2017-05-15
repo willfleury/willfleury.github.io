@@ -12,7 +12,7 @@ My areas of work and research cover:
 
 Data Engineering 
 
-* The latest architectures and toolkits for managing Big Data
+* The latest architectures, engines and data formats for managing Fast, Big Data
 * The JVM
 
 Machine Learning
