@@ -7,6 +7,21 @@ categories: [hyper-parameter, bayesian optimization]
 
 # Global Black-Box Optimization applied to Hyper-parameter Tuning
 
+In this post, we discuss the problem of global black-box optimisation. We cover the challenges involved in such an optimisation and recent approaches to solving the problem. While it is not intended as an exhaustive literature review, we do cover a variety of methods and why they may, or may not be applicable to a given problem. 
+
+
+* [Overview](#overview)
+* [Challenges](#challenges)
+  * [Complex Search Space](#complex-search-space)
+  * [Costly Objective Function](#costly-objective-function)
+* [Discussion of Available Methods](#discussion-of-available-methods)  
+  * [Grid & Random Search](#grid-&-random-search)
+  * [Evolutionary Algorithms](#evolutionary-algorithms)
+  * [Bayesian Optimization](#bayesian-optimization)
+  * [Tree of Parzen Estimator](#tree-of-parzen-estimator)
+  * [Final Notes](#final-notes)
+* [Visualising Optimisation](#visualising-optimisation)
+  
 ## Overview
 
 Global black-box optimisation is the problem of minimising an objective function over a configuration space. This objective function may be based in the physical or computational space. The objective function is either entirely unknown or intractable, and so it is a form of black box optimisation. 
@@ -63,7 +78,7 @@ Naive approaches quickly lose all feasibility even with what appears to be a rel
 
 ## Discussion of Available Methods
 
-There are 4 main types of algorithms we will discuss in this blog post.
+As discussed in the abstract, this post is not intended as an exhaustive report on the available methods and so there are some which we do not discuss. The 4 main types of algorithms we will discuss in this blog post are:
 
 * Grid Search
 * Random Search
@@ -71,6 +86,8 @@ There are 4 main types of algorithms we will discuss in this blog post.
 * Sequential Model-Based Optimization
     * Bayesian Optimisation
     * Tree Parzen Estimators
+    
+We also briefly mention some related algorithms including Sequential Model-based Algorithm Configuration (SMAC) and Particle Swarm Optimisation (PSO). 
 
 ### Grid & Random Search
 
@@ -107,7 +124,7 @@ The advantages of SMBO are that it [8]:
 * Handles parallel evaluations of $ f(x) $
 * Copes with hundreds of variables, even with budget of just a few hundred function evaluations
 
-Gaussian Processes are typically chosen as the models for SMBO, but other model types can be chosen such as random forests which are used in the SMAC algorithm [11]. We discuss only Bayesian Optimization and TPE in this post.
+Gaussian Processes are typically chosen as the models for SMBO, but other model types can be chosen such as random forests which are used in the Sequential Model-based Algorithm Configuration (SMAC) algorithm [11]. We discuss only Bayesian Optimization and TPE in this post.
 
 
 #### Bayesian Optimization
@@ -189,7 +206,7 @@ Another form of SMBO algorithm is the Tree of Parzen Estimator (TPE). Whereas th
 
 We have found the TPE algorithm to be a simple and very effective optimisation method to obtain competitive results on a variety of problems. It requires slightly more evaluations than Bayesian Optimisation but is much easier to start working with.
 
-### Conclusion
+### Final Notes
 
 There are a number optimization libraries which allow one to test a variety of these optimisation algorithms, and some others which we don’t specifically mention here such as Particle Swarm Optimisation (PSO). [Optunity](http://optunity.readthedocs.io/en/latest/user/index.html) is an example of such a library. While we have not used this library, it appears to provide an elegant and common interface over a variety of hyper-parameter optimisation approaches (what it calls solvers). An excellent comparison and overview between the different approaches and various implementations can be found [here](https://arxiv.org/pdf/1603.09441.pdf). It compares the approaches both with varying numbers of dimensions and smoothness. 
 
