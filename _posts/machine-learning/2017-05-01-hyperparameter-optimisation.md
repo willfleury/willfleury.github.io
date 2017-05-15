@@ -61,7 +61,7 @@ In addition to the cost of the objection function, other factors which can affec
 
 Naive approaches quickly lose all feasibility even with what appears to be a relatively low dimensionality problem at a first glance. Luckily, the last number of years has seen an increase in research in the area of global black-box optimisation. The success machine learning algorithms, in particular deep learning, have led to an increase in research both in academia and industry. However, too much time was, and still is being wasted on the "art" of hyper-parameter tuning. This has led to dedicated research aimed at turning hyper-parameter optimisation into a science  [4]. Once there is a formal, methodical approach, the tuning can be automated allowing researchers to concentrate on other areas. We will discuss some of the approaches available, open source implementations of them, and some usage notes based on real world usage. The discussion is from a practical implementation perspective. Those who wish to dig into the hard core theory can read the original papers linked to from this post.
 
-## Available Methods
+## Discussion of Available Methods
 
 There are 4 main types of algorithms we will discuss in this blog post.
 
@@ -74,7 +74,7 @@ There are 4 main types of algorithms we will discuss in this blog post.
 
 ### Grid & Random Search
 
-To summarise (plagiarize) the conclusion in [4].  
+To qote the conclusion in [4].  
 >Grid search experiments are common in the literature of empirical machine learning, where they are used to optimize the hyper-parameters of learning algorithms. It is also common to perform multistage, multi-resolution grid experiments that are more or less automated, because a grid experiment with a fine-enough resolution for optimization would be prohibitively expensive. We have shown that random experiments are more efficient than grid experiments for hyper-parameter optimization in the case of several learning algorithms on several data sets. Our analysis of the hyper-parameter response surface (Ψ) suggests that random experiments are more efficient because not all hyperparameters are equally important to tune. Grid search experiments allocate too many trials to the exploration of dimensions that do not matter and suffer from poor coverage in dimensions that are important. Compared with the grid search experiments of Larochelle et al. (2007) [7], random search found better models in most cases and required less computational time. Random experiments are also easier to carry out than grid experiments for practical reasons related to the statistical independence of every trial.
 
 >* The experiment can be stopped any time and the trials form a complete experiment.
