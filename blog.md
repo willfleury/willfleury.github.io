@@ -18,4 +18,4 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 
 
 ### Machine Learning
-* [Global Black-Box Optimization applied to Hyper-parameter Tuning]({% post_url /machine-learning/2017-05-01-hyperparameter-optimisation %})
+* [Global Black-Box Optimization applied to Hyper-parameter Tuning]({% post_url /machine-learning/2017-05-15-hyperparameter-optimisation %})
