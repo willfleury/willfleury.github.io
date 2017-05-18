@@ -43,17 +43,17 @@ The manual exploration of the configuration search space by an expert is a time 
 
 Where there are only one or two hyper-parameters, with a handful of discrete domain values per parameter, the problem can be solved via naive approaches such as trialing every combination of configuration options, i.e. grid search. In fact for very low dimensionality spaces, one should probably avoid more advanced methods, as they are unlikely to yield any benefit. However, when the search space involves even a handful of hyper-parameters with large continuous domains, the number of combinations which must be run in order to have sampled the space effectively with a naive approach grows exponentially. This is known as the Curse of Dimensionality.
 
-Let's take two examples. The first example has only two hyper-parameters
+Let's take a few examples. The first example has only two hyper-parameters with discrete domains 
 
-$ A \in [0, 5, 10] $ and $ B \in [1, 50] $ gives,
+$ A \in \\{0, 5, 10\\} $ and $ B \in \\{1, 50\\} $ gives,
 
 $ \text{Combinations} = C(A) \times C(B) = 3 \times 2 = 6 $
 
-Changing the domains of the parameters to, $ A \in [0:100] \$ and $ B \in [0.01:1] \$ with quantization of $ 1 \$ and $ 0.01 \$ respectively, gives,
+If the hyper-parameters are instead continuous, $ A \in [0:100] \$ and $ B \in [0.01:1] \$ and we discretise (quantise) the continuous interval into steps of $ 1 \$ and $ 0.01 \$ respectively, gives,
 
 $ \text{Combinations} = C(A) \times C(B) = 100 \times 99 = 9900 $
 
-If we add in another hyper-parameter $ C \in [0:2] $ with quantization of $ 0.01 $ it gives,
+Adding another continuous hyper-parameter $ C \in [0:2] $ and discretise with step size of $ 0.01 $ it gives,
 
 $ \text{Combinations} = C(A) \times C(B) \times C(C) = 100 \times 99 \times 200 = 1980000 $
 
