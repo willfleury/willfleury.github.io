@@ -4,7 +4,7 @@ title: Blog
 description: Data Architecture, Machine Learning, Computer Science and other stuff..
 ---
 
-## Blog Posts
+## Posts
 
 ### Implementing the Lambda Architecture at Boxever - March 2017
 
