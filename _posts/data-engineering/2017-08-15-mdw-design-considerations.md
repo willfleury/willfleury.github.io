@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Modern Data Warehouse Architectures - Design Considerations
+title: Design Considerations
 description: Design considerations for modern data warehouses
-categories: [data engineering, analytics]
+categories: [data engineering, analytics, data warehouse]
 ---
 
 ## Design Considerations
