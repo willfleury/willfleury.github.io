@@ -2,7 +2,7 @@
 layout: default
 title: Why Separate Storage and Compute?
 description: Why separate storage and compute (query) concerns for a modern data warehouse architecture?
-categories: [data engineering, analytics, data warehouse]
+categories: [data-engineering, analytics]
 ---
 
 ## Why Separate Storage and Query Engine Concerns?

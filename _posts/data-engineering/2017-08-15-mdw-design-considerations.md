@@ -2,7 +2,7 @@
 layout: default
 title: Design Considerations
 description: Design considerations for modern data warehouses
-categories: [data engineering, analytics, data warehouse]
+categories: [data-engineering, analytics]
 ---
 
 ## Design Considerations
