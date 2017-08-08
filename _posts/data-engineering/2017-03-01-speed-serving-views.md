@@ -2,7 +2,7 @@
 layout: default
 title: Speed Serving Views
 description: Building Speed Serving Views for the Lambda Architecture with Cassandra Time Series
-categories: [data engineering, boxever]
+categories: [data-engineering, boxever]
 ---
 
 ## Speed Serving Views

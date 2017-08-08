@@ -2,7 +2,7 @@
 layout: default
 title: Developing a Flexible Changelog
 description: Building a Flexible Changelog on top Kafka for the Lambda Architecture
-categories: [data engineering, boxever]
+categories: [data-engineering, boxever]
 ---
 
 ## The Changelog

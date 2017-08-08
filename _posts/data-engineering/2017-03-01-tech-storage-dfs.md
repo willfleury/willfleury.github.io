@@ -2,7 +2,7 @@
 layout: default
 title: Technology, Storage and Data Format Choices
 description: What are the technology choices when implementing the Lambda Architecture
-categories: [data engineering, boxever]
+categories: [data-engineering, boxever]
 ---
 
 ## Technology, Storage and Data Format Choices

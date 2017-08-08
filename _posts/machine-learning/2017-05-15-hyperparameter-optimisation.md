@@ -2,7 +2,7 @@
 layout: default
 title: Global Black-Box Optimization applied to Hyper-parameter Tuning
 description: Hyper-parameter tuning for machine learning models
-categories: [hyper-parameter, bayesian optimization]
+categories: [machine-learning, bayesian-optimization]
 ---
 
 # Global Black-Box Optimization applied to Hyper-parameter Tuning

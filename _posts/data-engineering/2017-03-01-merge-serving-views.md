@@ -2,7 +2,7 @@
 layout: default
 title: Querying & Merging Views
 description: How to Query & Merge the Serving Views in the Lambda Architecture
-categories: [data engineering, boxever]
+categories: [data-engineering, boxever]
 ---
 
 ## Merging the Serving Views 
