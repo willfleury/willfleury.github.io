@@ -4,7 +4,7 @@ title: Blog
 description: Data Architecture, Machine Learning, Computer Science and other stuff..
 ---
 
-## Posts (Cronological Order)
+## Posts
 
 ### Implementing the Lambda Architecture at Boxever
 
@@ -24,4 +24,6 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 ### Modern Data Warehouse Architectures 
 
 * [Why Separate Storage and Compute]({% post_url /data-engineering/2017-08-15-mdw-storage-query-engine-separation %})
-* [Design Considerations]({% post_url /data-engineering/2017-08-15-mdw-design-considerations %})
+* [Design Considerations I - Storage]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-I %})
+* [Design Considerations II - Real-time & Resource Isolation]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-II %})
+* [Design Considerations III - Query Engine]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-III %})
