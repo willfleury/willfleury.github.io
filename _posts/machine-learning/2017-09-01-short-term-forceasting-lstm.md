@@ -13,15 +13,22 @@ Short term forecasting in the renewable energy sector is becoming increasingly i
 
 In this post, we will show you how to implement a short term weather forecast using a type of deep learning known as recurrent neural networks ([RNN](https://en.wikipedia.org/wiki/Recurrent_neural_network)). The particular type of RNN we use is called a Long Short Term Memory ([LSTM](https://en.wikipedia.org/wiki/Long_short-term_memory)) network. We will use [Keras](https://keras.io/) (version 2+) with the [TensorFlow](https://www.tensorflow.org/) backend as the framework for building this network. 
 
+In this post we're not going to argue the merits of deep learning via LSTMs vs more classical methods such as [ARIMA](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average) or vice versa. Instead we're simply showing how to approach and implement a forecasting problem using LSTMs. In general simpler machine learning models should be tried first.
 
-### Why use LSTM
-Recurrent neural networks enable the learning and encoding of temporal features of a signal. This is idea for forecasting signals which are in some way predictive based on past events. LSTMs are a type of recurrent networks that overcome some of the historic issues related to training recurrent networks, such as the [vanishing gradients problem](https://en.wikipedia.org/wiki/Vanishing_gradient_problem). We won't delve into the details of LSTMs here and will instead point you to this [article](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) for a thorough overview. 
 
 ### ARIMA
 
-Auto regressive models such as ARIMA are the most commonly used models for forecasting. 
+Auto-Regressive Integrated Moving Average ([ARIMA](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average)) models are the most general and commonly used class of models for forecasting of a stationary signal (or on which can be made stationary). They support random walk, seasonal trend, non-seasonal exponentional smoothing and autoregressive models. 
 
-Discuss issues with ARIMA.. blah blah.
+Lags of the stationarized series in the forecasting equation are called "autoregressive" terms, lags of the forecast errors are called "moving average" terms, and a time series which needs to be differenced to be made stationary is said to be an "integrated" version of a stationary series. Random-walk and random-trend models, autoregressive models, and exponential smoothing models are all special cases of ARIMA models. See [here](https://people.duke.edu/~rnau/411arim.htm) for more details. While there is a relatively systematic approach to determining the ARIMA model parameters. There are many many publications and applications of ARIMA to renewables forecasting with various extensions to solve different issues. 
+
+To see an application of ARIMA for forecasting and the method for determining the model parameters, see the following [notebook](https://datascience.ibm.com/exchange/public/entry/view/815137c868b916821dec777bdc23013c). 
+
+
+### Why use a Recurrent Neural Network
+
+Recurrent neural networks enable the learning and encoding of temporal features of a signal. This is idea for forecasting signals which are in some way predictive based on past events. LSTMs are a type of recurrent networks that overcome some of the historic issues related to training recurrent networks, such as the [vanishing gradients problem](https://en.wikipedia.org/wiki/Vanishing_gradient_problem). We won't delve into the details of LSTMs here and will instead point you to this [article](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) for a thorough overview. 
+
 
 
 ```python
@@ -812,7 +819,7 @@ def build_model(layers):
 
 Fit the model with the training data. We use a validation split of the training data (10%) to allow for things such as early stopping to work (it validates the validation loss against the training loss). 
 
-The shape of the network is passed in via an argument. The first and last values in that layers array represent the input and output size respectively. The other 3 values represent the size of the 3 layers of the network. 
+The size of each network layer is passed in via an argument. The first and last values in that layers array represent the input and output size respectively. The other 3 values represent the size of the 3 layers of the network. 
 
 The batch_size here refers to the number of samples to be taken between gradient updates. Powers of two are recommended and typically values are 256, 512 etc. Batch learning greatly improves the speed of training and the stability of the convergence. 
 
@@ -820,6 +827,7 @@ The batch_size here refers to the number of samples to be taken between gradient
 #### Using AWS or Google Cloud GPUs
 
 A GPU is absolutely essential to train a netwok in a reasonble amount of time. Fortunately most of the cloud providers not provide access to a variety of options for deep learning with optimized instances and GPUs. We won't go into the details of how to do for each or the benefits of one versus the other in this post. We trained the model on a p2.2xlarge instance on AWS using the AWS Spot market which cost approx $0.3 / hour. Training **???** epocs took approximately **???** hours. 
+
 
 #### Hyperparameter Tuning
 
@@ -831,7 +839,7 @@ Hyperparameter tuning is an essential part of any machine learning process. Do n
 ```python
 from keras.callbacks import TensorBoard, EarlyStopping, ReduceLROnPlateau
 
-def run_network(X_train, y_train, X_test, y_test, layers, epochs, batch_size=512):
+def run_network(X_train, y_train, X_test, layers, epochs, batch_size=512):
     model = build_model(layers)
     history = None
     
@@ -859,8 +867,7 @@ def run_network(X_train, y_train, X_test, y_test, layers, epochs, batch_size=512
 model, predicted, history = run_network(
     X_train, 
     y_train, 
-    X_test, 
-    y_test, 
+    X_test,
     layers=[X_train.shape[2], 60, 60, 60, y_train.shape[1]],
     epochs=4)
 ```
@@ -968,15 +975,14 @@ import matplotlib.pyplot as plt
 plot_samples=250
 plots = len(horizons)
 
-nems4_predicted_signal = features['nems4_wind_speed'][sequence_offset+row_split+12:].shift(nems4_lookahead)
+real_signal = features['wind_speed'][sequence_offset+row_split:].values
+nems4_predicted_signal = features['nems4_wind_speed'][sequence_offset+row_split:].shift(nems4_lookahead)
 
 fig = plt.figure(figsize=(14, 5 * plots))
 fig.suptitle("Model Prediction at each Horizon")
 
 for i, horizon in enumerate(horizons):
     plt.subplot(plots,1,i+1)
-    
-    real_signal = features['wind_speed'][sequence_offset+row_split+horizon:].values
     
     plt.plot(real_signal[:plot_samples], label='actual')
     plt.plot(nems4_predicted_signal.values[:plot_samples], label='nems4')
@@ -989,13 +995,11 @@ for i, horizon in enumerate(horizons):
 
 {% include image.html img="/assets/images/machine-learning/forecasting_image_0.png" %}
 
-
 ### Critique 
 
-One very important property we are missing for our predictions, is the confidence or model has in that prediction - aka credible intervals. We can actually extend this model and add a Mixture Density Network ([MDN](http://edwardlib.org/tutorials/mixture-density-network)) as the final layer in the network. 
+One very important property we are missing for our predictions, is the confidence our model has in a given prediction - aka credible interval. We can actually extend this model and add a Mixture Density Network ([MDN](http://edwardlib.org/tutorials/mixture-density-network)) as the final layer in the network. MDNs are very useful when combined with neural networks, where the outputs of the neural network are the parameters of the mixture model, rather than direct prediction of the data label. So for each input, you would have a set of mean parameters, a set of standard deviation parameters, and a set of probabilities that the output point would fall into those gaussian distributions ([taken from](http://blog.otoro.net/2015/06/14/mixture-density-networks/)). In a follow up post we will extend our model with an MDN.
 
-MDNs are very useful when combined with neural networks, where the outputs of the neural network are the parameters of the mixture model, rather than direct prediction of the data label. So for each input, you would have a set of mean parameters, a set of standard deviation parameters, and a set of probabilities that the output point would fall into those gaussian distributions ([taken from](http://blog.otoro.net/2015/06/14/mixture-density-networks/)).
-
+Another critique is that we don't do any feature engineering at all. While one of the stated benefits of deep learning in general is its inherent ability to extract latent features, it would be beneficial at least to test out some standard forecasting features such as trend strenghts etc. They may or may not improve the result. Another interesting idea which Uber recently published about their use of LSTMs for forecasting was to use a separate LSTM autoencoder network to create additional features as input to the LSTM model for prediction. See their article [here](https://eng.uber.com/neural-networks/). This is very easy to achieve with Keras. 
 
 
 
