@@ -7,6 +7,8 @@ categories: [machine-learning, forecasting, LSTM]
 
 # Short Term Forecasting using Recurrent Neural Networks
 
+The notebook this blog post was generated from can be found on [github](https://github.com/willfleury/wind-forecasting/blob/master/Forecasting.ipynb)
+
 ## Overview
 
 Short term forecasting in the renewable energy sector is becoming increasingly important. With renewables penetrating the market faster than expected, and the inherent uncertainty involved with weather forecasts, it is putting a lot of strain on the existing energy providers and distributors to both manage and balance the power grid. Doing so efficiently requires accurate knowledge of both both supply and demand. As both of these are future events, forecasting is required to predict these factors. Energy demand is a more stable signal than supply of renewable energy which is based on local weather systems relative to the energy generation. Of course demand can also spike unexpectedly with events such as extreme weather spells. Bad predictions can cause energy providers to end up with a shortfall in supply which means they will be required to generate the shortfall by burning more expensive and less climate friendly fuels. It can also result in large oversupply where the company is burning fuel needlessly with is both bad economically and for the climate. Therefore, better predictions in the [1, 48] hour time horizon are absolutely central to efficiently balancing supply and demand in the energy grid. 
@@ -38,13 +40,22 @@ import seaborn as sns
 sns.set_color_codes()
 ```
 
+## Weather Data
+
+As we want to make predictions on the weather at a given location at a given point in time, we need observational data for that location. Another common approach is to predict the power output of a wind farm based which is of course based on the weather and the power conversion properties of the wind turbines. However as the power output prediction relies on the weather prediction and the power conversion properties of the wind turbines, modelling the weather predictions can be seen as the first step in modelling the power output. 
+
+There are many caveats we won’t go into in this post on the observational data such as the height of the observation tower relative to the turbines and other similarly important factors. An ideal scenario would be observations of the weather data from the same location and height of each turbine in a wind farm. This would provide the most accurate observational data to use in training our models. Sometimes it is easier to model the turbin power output as it can be more stable and incorporate the power conversion properties of the tubines also. However, for the purposes of demonstration, we will use the weather observation available from the nearest NOAA weather station which happens to be El Prat Airport in Barcelona. This is from a height of only 8 metres and measurements at this height tend to be more unstable.
+
+It is also highly advisable to include at least one numerical weather models predictions in your model. These models will help predict the effect of global weather patterns and potential impact that can have on the more local scale. Remember, we are not using the global weather data to build our model and so we cannot accurately attempt to predict global weather systems which can naturally move across local areas.
+
+
 ### Observational Data
 
 We get the observational data from NOAA. NOAA collects the weather station observations from stations in countries all around the world. To get it for a given station, you just need to know whats known as the USAF and WBAN IDs. We are using Barcelona El Prat Airport in this notebook but you can change to whatever. 
 
 We providea script that allows you to download the data locally
 
-    data/donwload-observations.sh
+    data/download-observations.sh
     
 We then read and parse this data for the exact weather observation station we wish to work with (there are, or have been multiple in El Prat). Don't use data from many stations as its unlikely to be consistent (same height, location etc). 
 
@@ -78,10 +89,6 @@ def read_observations(years, usaf='081810', wban='99999'):
                                               for r in reports if r.latitude in station_latitudes and r.datetime.minute == 0),
                              columns=['timestamp', 'AT', 'precipitation', 'humidity', 'pressure', 'wind_speed', 'wind_direction'], 
                              index='timestamp')
-    
-    observations = observations[['AT', 'precipitation', 
-                             'humidity', 'pressure', 
-                             'wind_speed']]
     
     return observations
 
@@ -140,7 +147,7 @@ Join the datasets by the timestamps
 
 
 ```python
-years = range(2010, 2015)
+years = range(2007, 2015)
 dataset = pd.merge(read_observations(years), read_nems4(years), left_index=True, right_index=True, how='inner')
 
 original = dataset.copy(deep=True)
@@ -163,6 +170,10 @@ dataset.describe()
     .dataframe tbody tr th {
         vertical-align: top;
     }
+    
+    .dataframe {
+        font-size: small;
+    }
 </style>
 <table border="1" class="dataframe">
   <thead>
@@ -173,6 +184,7 @@ dataset.describe()
       <th>humidity</th>
       <th>pressure</th>
       <th>wind_speed</th>
+      <th>wind_direction</th>
       <th>nems4_AT</th>
       <th>nems4_precipitation</th>
       <th>nems4_humidity</th>
@@ -183,42 +195,45 @@ dataset.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>43177.000000</td>
-      <td>43130.000000</td>
-      <td>43162.000000</td>
-      <td>35117.000000</td>
-      <td>43213.000000</td>
-      <td>43217.000000</td>
-      <td>43217.000000</td>
-      <td>43217.000000</td>
-      <td>43217.000000</td>
-      <td>43217.000000</td>
+      <td>69153.000000</td>
+      <td>69142.000000</td>
+      <td>69130.000000</td>
+      <td>52759.000000</td>
+      <td>69182.000000</td>
+      <td>67561.000000</td>
+      <td>69198.000000</td>
+      <td>69198.000000</td>
+      <td>69198.000000</td>
+      <td>69198.000000</td>
+      <td>69198.000000</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>16.911279</td>
-      <td>0.084672</td>
-      <td>68.819865</td>
-      <td>1016.236418</td>
-      <td>4.076880</td>
-      <td>16.149210</td>
-      <td>0.037606</td>
-      <td>71.680380</td>
-      <td>1015.828378</td>
-      <td>3.464177</td>
+      <td>16.766853</td>
+      <td>0.111163</td>
+      <td>67.704470</td>
+      <td>1016.462495</td>
+      <td>4.108177</td>
+      <td>236.313702</td>
+      <td>16.277155</td>
+      <td>0.038027</td>
+      <td>71.139542</td>
+      <td>1016.022515</td>
+      <td>3.486428</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>6.829713</td>
-      <td>1.083148</td>
-      <td>14.874102</td>
-      <td>6.826032</td>
-      <td>2.096274</td>
-      <td>6.763601</td>
-      <td>0.272675</td>
-      <td>15.757395</td>
-      <td>7.093197</td>
-      <td>2.032260</td>
+      <td>6.758833</td>
+      <td>1.422863</td>
+      <td>14.481048</td>
+      <td>6.862298</td>
+      <td>2.106659</td>
+      <td>107.693595</td>
+      <td>6.708840</td>
+      <td>0.285613</td>
+      <td>16.550182</td>
+      <td>7.107001</td>
+      <td>1.969970</td>
     </tr>
     <tr>
       <th>min</th>
@@ -227,62 +242,67 @@ dataset.describe()
       <td>8.000000</td>
       <td>980.200000</td>
       <td>0.000000</td>
+      <td>10.000000</td>
       <td>-5.840000</td>
       <td>0.000000</td>
-      <td>12.000000</td>
+      <td>1.000000</td>
       <td>982.000000</td>
       <td>0.000000</td>
     </tr>
     <tr>
       <th>25%</th>
-      <td>11.800000</td>
+      <td>11.600000</td>
+      <td>0.000000</td>
+      <td>59.000000</td>
+      <td>1012.700000</td>
+      <td>2.600000</td>
+      <td>160.000000</td>
+      <td>11.340000</td>
       <td>0.000000</td>
       <td>60.000000</td>
-      <td>1012.500000</td>
-      <td>2.600000</td>
-      <td>11.130000</td>
-      <td>0.000000</td>
-      <td>61.000000</td>
       <td>1012.000000</td>
-      <td>1.930000</td>
+      <td>2.040000</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>16.800000</td>
+      <td>16.700000</td>
       <td>0.000000</td>
-      <td>70.000000</td>
+      <td>69.000000</td>
       <td>1016.700000</td>
-      <td>3.600000</td>
-      <td>16.410000</td>
+      <td>4.100000</td>
+      <td>240.000000</td>
+      <td>16.460000</td>
       <td>0.000000</td>
       <td>73.000000</td>
       <td>1016.000000</td>
-      <td>3.090000</td>
+      <td>3.120000</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>22.600000</td>
+      <td>22.300000</td>
       <td>0.000000</td>
-      <td>79.000000</td>
-      <td>1020.300000</td>
+      <td>78.000000</td>
+      <td>1020.500000</td>
       <td>5.100000</td>
+      <td>340.000000</td>
       <td>21.400000</td>
       <td>0.000000</td>
-      <td>84.000000</td>
+      <td>85.000000</td>
       <td>1020.000000</td>
-      <td>4.640000</td>
+      <td>4.590000</td>
     </tr>
     <tr>
       <th>max</th>
       <td>35.300000</td>
-      <td>56.000000</td>
+      <td>96.000000</td>
       <td>100.000000</td>
       <td>1038.700000</td>
-      <td>17.000000</td>
+      <td>27.800000</td>
+      <td>360.000000</td>
       <td>39.210000</td>
       <td>16.000000</td>
       <td>100.000000</td>
-      <td>1037.000000</td>
+      <td>1039.000000</td>
       <td>22.320000</td>
     </tr>
   </tbody>
@@ -325,6 +345,9 @@ The second approach is to simply predict the difference at the horizons. So if w
 ```python
 from sklearn import preprocessing
 
+pd.options.mode.chained_assignment = None
+np.random.seed(1234)
+
 def drop_duplicates(df):
     print("Number of duplicates: {}".format(len(df.index.get_duplicates())))
     return df[~df.index.duplicated(keep='first')]
@@ -342,8 +365,6 @@ def first_order_difference(data, columns):
     return data.dropna()
 
 def derive_prediction_columns(data, column, horizons):
-    pd.options.mode.chained_assignment = None
-    
     for look_ahead in horizons:
         data['prediction_' + str(look_ahead)] = data[column].diff(periods=look_ahead).shift(-look_ahead)
     
@@ -406,7 +427,7 @@ features = dataset[['wind_speed',
                     'nems4_pressure']]
 
 # the time horizons we're going to predict (in hours)
-horizons = [1, 12]
+horizons = [1, 6, 12, 24]
 
 features = first_order_difference(features, features.columns)
 features = derive_prediction_columns(features, 'wind_speed', horizons)
@@ -417,8 +438,8 @@ scaled = scale_features(scaler, features)
 scaled.describe()
 ```
 
-    Number of duplicates: 0
-    Number of rows with nan: 0
+    Number of duplicates: 165
+    Number of rows with nan: 18206
 
 
 
@@ -436,6 +457,10 @@ scaled.describe()
 
     .dataframe tbody tr th {
         vertical-align: top;
+    }
+    
+    .dataframe {
+        font-size: small;
     }
 </style>
 <table border="1" class="dataframe">
@@ -459,177 +484,195 @@ scaled.describe()
       <th>pressure_d</th>
       <th>nems4_pressure_d</th>
       <th>prediction_1</th>
+      <th>prediction_6</th>
       <th>prediction_12</th>
+      <th>prediction_24</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>count</th>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
-      <td>4.310900e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
+      <td>6.900800e+04</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>1.041692e-16</td>
-      <td>3.533841e-16</td>
-      <td>-2.320732e-16</td>
-      <td>-2.188872e-16</td>
-      <td>1.766921e-16</td>
-      <td>-2.505335e-17</td>
-      <td>3.858216e-15</td>
-      <td>2.761143e-15</td>
-      <td>-1.633825e-17</td>
-      <td>1.218673e-17</td>
-      <td>4.779916e-18</td>
-      <td>1.454578e-17</td>
-      <td>2.301365e-17</td>
-      <td>-1.589013e-17</td>
-      <td>-1.528749e-17</td>
-      <td>-3.840415e-17</td>
-      <td>-2.617107e-17</td>
-      <td>1.823373e-17</td>
+      <td>-3.566717e-16</td>
+      <td>1.680393e-16</td>
+      <td>-7.907733e-17</td>
+      <td>-1.993408e-16</td>
+      <td>-1.713342e-16</td>
+      <td>-2.059305e-16</td>
+      <td>-7.789529e-15</td>
+      <td>-7.769759e-15</td>
+      <td>1.574725e-17</td>
+      <td>2.702838e-18</td>
+      <td>1.657741e-17</td>
+      <td>1.009060e-17</td>
+      <td>-2.728580e-18</td>
+      <td>-1.660315e-18</td>
+      <td>5.045298e-18</td>
+      <td>5.220339e-17</td>
+      <td>-7.500376e-18</td>
+      <td>1.762637e-17</td>
+      <td>6.190787e-18</td>
+      <td>-2.612744e-17</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
-      <td>1.000012e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
+      <td>1.000007e+00</td>
     </tr>
     <tr>
       <th>min</th>
-      <td>-1.944119e+00</td>
-      <td>-1.704865e+00</td>
-      <td>-2.993382e+00</td>
-      <td>-3.254907e+00</td>
-      <td>-4.086010e+00</td>
-      <td>-3.784563e+00</td>
-      <td>-5.122080e+00</td>
-      <td>-4.768033e+00</td>
-      <td>-6.395646e+00</td>
-      <td>-1.447074e+01</td>
-      <td>-8.009811e+00</td>
-      <td>-8.656896e+00</td>
-      <td>-6.802778e+00</td>
-      <td>-9.080636e+00</td>
-      <td>-2.591511e+01</td>
-      <td>-6.966350e+00</td>
-      <td>-6.395534e+00</td>
-      <td>-4.641788e+00</td>
+      <td>-1.949420e+00</td>
+      <td>-1.772110e+00</td>
+      <td>-3.004746e+00</td>
+      <td>-3.301075e+00</td>
+      <td>-4.121122e+00</td>
+      <td>-4.236730e+00</td>
+      <td>-5.140027e+00</td>
+      <td>-4.790031e+00</td>
+      <td>-1.446204e+01</td>
+      <td>-1.503608e+01</td>
+      <td>-7.894069e+00</td>
+      <td>-8.703198e+00</td>
+      <td>-7.437843e+00</td>
+      <td>-1.231936e+01</td>
+      <td>-2.509671e+01</td>
+      <td>-6.993820e+00</td>
+      <td>-1.446192e+01</td>
+      <td>-8.394489e+00</td>
+      <td>-7.188859e+00</td>
+      <td>-1.000997e+01</td>
     </tr>
     <tr>
       <th>25%</th>
-      <td>-7.044104e-01</td>
-      <td>-7.551439e-01</td>
-      <td>-7.518787e-01</td>
-      <td>-7.404916e-01</td>
-      <td>-5.922197e-01</td>
-      <td>-6.764342e-01</td>
-      <td>-5.423194e-01</td>
-      <td>-5.382363e-01</td>
-      <td>-7.267316e-01</td>
-      <td>-5.333957e-01</td>
-      <td>-5.789955e-01</td>
-      <td>-5.364996e-01</td>
-      <td>-5.101937e-01</td>
-      <td>-5.342834e-01</td>
-      <td>-3.715364e-01</td>
-      <td>-1.034077e-03</td>
-      <td>-7.266890e-01</td>
-      <td>-6.676166e-01</td>
+      <td>-7.155426e-01</td>
+      <td>-7.349701e-01</td>
+      <td>-7.537458e-01</td>
+      <td>-7.361154e-01</td>
+      <td>-6.006095e-01</td>
+      <td>-6.726005e-01</td>
+      <td>-5.346007e-01</td>
+      <td>-5.654560e-01</td>
+      <td>-7.195400e-01</td>
+      <td>-5.167970e-01</td>
+      <td>-5.705993e-01</td>
+      <td>-5.307731e-01</td>
+      <td>-5.188563e-01</td>
+      <td>-5.279457e-01</td>
+      <td>-3.583810e-01</td>
+      <td>4.053942e-05</td>
+      <td>-7.195453e-01</td>
+      <td>-6.078183e-01</td>
+      <td>-6.658027e-01</td>
+      <td>-5.960653e-01</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>-2.275993e-01</td>
-      <td>-1.843273e-01</td>
-      <td>-4.710922e-03</td>
-      <td>3.897706e-02</td>
-      <td>7.966304e-02</td>
-      <td>8.474023e-02</td>
-      <td>8.739766e-02</td>
-      <td>2.573652e-02</td>
-      <td>5.226357e-05</td>
-      <td>-1.180667e-02</td>
-      <td>-9.647500e-02</td>
-      <td>-1.519434e-01</td>
-      <td>1.578045e-05</td>
-      <td>-1.362968e-04</td>
-      <td>-1.339644e-03</td>
-      <td>-1.034077e-03</td>
-      <td>8.598094e-05</td>
-      <td>3.114281e-04</td>
+      <td>-3.690200e-03</td>
+      <td>-1.808121e-01</td>
+      <td>-1.328511e-02</td>
+      <td>2.889863e-02</td>
+      <td>8.968714e-02</td>
+      <td>1.127162e-01</td>
+      <td>6.610709e-02</td>
+      <td>-2.179383e-03</td>
+      <td>-3.753491e-05</td>
+      <td>-5.168681e-05</td>
+      <td>-9.504935e-02</td>
+      <td>-1.565300e-01</td>
+      <td>6.767789e-05</td>
+      <td>2.805332e-05</td>
+      <td>1.454721e-04</td>
+      <td>4.053942e-05</td>
+      <td>-4.900348e-05</td>
+      <td>-7.816041e-05</td>
+      <td>-1.847117e-04</td>
+      <td>-2.486598e-04</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>4.876172e-01</td>
-      <td>5.784018e-01</td>
-      <td>8.303589e-01</td>
-      <td>7.755527e-01</td>
-      <td>6.843575e-01</td>
-      <td>7.824835e-01</td>
-      <td>6.169324e-01</td>
-      <td>5.897093e-01</td>
-      <td>4.361226e-01</td>
-      <td>4.855224e-01</td>
-      <td>3.860455e-01</td>
-      <td>3.757035e-01</td>
-      <td>5.102253e-01</td>
-      <td>5.340108e-01</td>
-      <td>3.688571e-01</td>
-      <td>-1.034077e-03</td>
-      <td>4.361510e-01</td>
-      <td>6.682395e-01</td>
+      <td>4.708781e-01</td>
+      <td>5.614545e-01</td>
+      <td>8.160308e-01</td>
+      <td>7.625963e-01</td>
+      <td>7.109541e-01</td>
+      <td>8.376240e-01</td>
+      <td>5.953020e-01</td>
+      <td>5.610973e-01</td>
+      <td>4.316640e-01</td>
+      <td>4.536759e-01</td>
+      <td>3.805006e-01</td>
+      <td>3.743730e-01</td>
+      <td>5.189917e-01</td>
+      <td>5.280018e-01</td>
+      <td>3.586719e-01</td>
+      <td>4.053942e-05</td>
+      <td>4.316487e-01</td>
+      <td>6.076620e-01</td>
+      <td>6.654333e-01</td>
+      <td>5.955680e-01</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>6.161669e+00</td>
-      <td>9.278434e+00</td>
-      <td>2.690953e+00</td>
-      <td>3.408293e+00</td>
-      <td>2.095311e+00</td>
-      <td>1.797383e+00</td>
-      <td>3.250295e+00</td>
-      <td>2.986594e+00</td>
-      <td>6.759142e+00</td>
-      <td>1.261550e+01</td>
-      <td>7.623853e+00</td>
-      <td>8.317237e+00</td>
-      <td>7.313019e+00</td>
-      <td>1.157305e+01</td>
-      <td>2.757832e+01</td>
-      <td>6.964282e+00</td>
-      <td>6.759093e+00</td>
-      <td>4.275051e+00</td>
+      <td>1.124358e+01</td>
+      <td>9.575419e+00</td>
+      <td>2.741228e+00</td>
+      <td>3.417031e+00</td>
+      <td>2.229607e+00</td>
+      <td>1.743759e+00</td>
+      <td>3.226974e+00</td>
+      <td>3.236661e+00</td>
+      <td>1.928263e+01</td>
+      <td>1.310763e+01</td>
+      <td>7.799080e+00</td>
+      <td>8.642535e+00</td>
+      <td>7.610953e+00</td>
+      <td>1.143946e+01</td>
+      <td>2.671037e+01</td>
+      <td>8.392674e+00</td>
+      <td>1.928245e+01</td>
+      <td>9.571829e+00</td>
+      <td>8.220198e+00</td>
+      <td>7.785089e+00</td>
     </tr>
   </tbody>
 </table>
@@ -682,7 +725,6 @@ def prepare_test_train(data, features, predictions, sequence_length, split_perce
     
     row = round(split_percent * result.shape[0])
     train = result[:row, :]
-    #np.random.shuffle(train) # not using stateful lstm
     
     X_train = train[:, :, :-num_predictions]
     y_train = train[:, -1, -num_predictions:]
@@ -717,14 +759,14 @@ X_train, y_train, X_test, y_test, row_split = prepare_test_train(
     feature_cols,
     prediction_cols,
     sequence_length,
-    split_percent = 0.8)
+    split_percent = 0.9)
 ```
 
-    Using 8 features to predict 2 horizons
-    Shape of data: (43062, 48, 10)
-    Shape of X train: (34450, 48, 8)
-    Shape of y train: (34450, 2)
-    Shape of X test: (8612, 48, 8)
+    Using 8 features to predict 4 horizons
+    Shape of data: (68961, 48, 12)
+    Shape of X train: (62065, 48, 8)
+    Shape of y train: (62065, 4)
+    Shape of X test: (6896, 48, 8)
 
 
 ### Validate Test & Train Dataset Preparation
@@ -774,15 +816,19 @@ for i, horizon in enumerate(horizons):
     assert(mean_squared_error(
         features['wind_speed'][sequence_offset+row_split+horizon:], 
         undiff_prediction[:-horizon,i]) < 1e-10)
+    
+    
 ```
 
 ### Build the LSTM Model
 
 Build the non stateful LSTM network. 
 
-We apply regularisation via dropout between each layer in the network. This should help overfitting. The RMSProp optimizer is recommended when working with LSTMs. The only tunable property of this is the learning rate. Keras has some callbacks that allow for tuning of this as the training progresses (e.g. see [ReduceLROnPlateau](https://keras.io/callbacks/#reducelronplateau)). 
+We apply regularisation via dropout between each layer in the network. This should help overfitting but we could also add L2 or L2 weight regularization to help also. The RMSProp optimizer is recommended when working with LSTMs. The only tunable property of this is the learning rate. Keras has some callbacks that allow for tuning of this as the training progresses (e.g. see [ReduceLROnPlateau](https://keras.io/callbacks/#reducelronplateau)). 
 
 The first and last layers deserve a comment. The input_shape argument in the first layer specifies the number of input features which is X_train.shape[2]. The last layer is the output layer (hence linear activation) and the size is equal to the number of time horizons we're predicting - y_train.shape[1]. 
+
+We're using a very simple model structure in this notebook with a small number of parameters in each layer. This means we should expect to see trends as opposed to capturing the finer details of the signal. With better and more abundant training data, we could look to use a bigger network with more regularization if necessary to capture higher level and more complext latent features of the signal. 
 
 
 ```python
@@ -808,12 +854,15 @@ def build_model(layers):
     
     model.add(Dense(layers[4], activation="linear"))
     
-    model.compile(loss="mse", optimizer=RMSprop)
+    model.compile(loss="mse", optimizer='rmsprop')
     
     print(model.summary())
           
     return model
 ```
+
+    Using TensorFlow backend.
+
 
 ### Train and Evaluate the Model
 
@@ -826,7 +875,7 @@ The batch_size here refers to the number of samples to be taken between gradient
 
 #### Using AWS or Google Cloud GPUs
 
-A GPU is absolutely essential to train a netwok in a reasonble amount of time. Fortunately most of the cloud providers not provide access to a variety of options for deep learning with optimized instances and GPUs. We won't go into the details of how to do for each or the benefits of one versus the other in this post. We trained the model on a p2.2xlarge instance on AWS using the AWS Spot market which cost approx $0.3 / hour. Training **???** epocs took approximately **???** hours. 
+While a GPU is absolutely essential to train a large network, for a small network like we are playing with in this notebook you don't gain massively. I found that it was about 4 times faster on a p2.xlarge GPU instance on AWS compared to locally on my 4 core i7. Most of the cloud providers give access to a variety of options for deep learning with optimized instances and GPUs. We won't go into the details of how to do for each or the benefits of one versus the other in this post. We trained the model on a p2.2xlarge instance on AWS using the AWS Spot market which cost approx $0.3 / hour. Training 100 epocs took approximately 2 hours. 
 
 
 #### Hyperparameter Tuning
@@ -851,10 +900,10 @@ def run_network(X_train, y_train, X_test, layers, epochs, batch_size=512):
             validation_split=0.1,
             callbacks=[
                 TensorBoard(log_dir='/tmp/tensorboard', write_graph=True),
-                EarlyStopping(monitor='val_loss', patience=2, mode='auto')
+                #EarlyStopping(monitor='val_loss', patience=5, mode='auto')
             ])
     except KeyboardInterrupt:
-        print("Training interrupted")
+        print("\nTraining interrupted")
     
     predicted = model.predict(X_test)
     
@@ -868,41 +917,65 @@ model, predicted, history = run_network(
     X_train, 
     y_train, 
     X_test,
-    layers=[X_train.shape[2], 60, 60, 60, y_train.shape[1]],
-    epochs=4)
+    layers=[X_train.shape[2], 20, 15, 20, y_train.shape[1]],
+    epochs=50)
 ```
 
     _________________________________________________________________
     Layer (type)                 Output Shape              Param #   
     =================================================================
-    lstm_1 (LSTM)                (None, None, 60)          16560     
+    lstm_16 (LSTM)               (None, None, 20)          2320      
     _________________________________________________________________
-    dropout_1 (Dropout)          (None, None, 60)          0         
+    dropout_16 (Dropout)         (None, None, 20)          0         
     _________________________________________________________________
-    lstm_2 (LSTM)                (None, None, 60)          29040     
+    lstm_17 (LSTM)               (None, None, 15)          2160      
     _________________________________________________________________
-    dropout_2 (Dropout)          (None, None, 60)          0         
+    dropout_17 (Dropout)         (None, None, 15)          0         
     _________________________________________________________________
-    lstm_3 (LSTM)                (None, 60)                29040     
+    lstm_18 (LSTM)               (None, 20)                2880      
     _________________________________________________________________
-    dropout_3 (Dropout)          (None, 60)                0         
+    dropout_18 (Dropout)         (None, 20)                0         
     _________________________________________________________________
-    dense_1 (Dense)              (None, 2)                 122       
+    dense_6 (Dense)              (None, 4)                 84        
     =================================================================
-    Total params: 74,762
-    Trainable params: 74,762
+    Total params: 7,444
+    Trainable params: 7,444
     Non-trainable params: 0
     _________________________________________________________________
     None
-    Train on 31005 samples, validate on 3445 samples
-    Epoch 1/4
-    31005/31005 [==============================] - 86s - loss: 0.7620 - val_loss: 0.6697
-    Epoch 2/4
-    31005/31005 [==============================] - 86s - loss: 0.6419 - val_loss: 0.5950
-    Epoch 3/4
-    31005/31005 [==============================] - 87s - loss: 0.6080 - val_loss: 0.5966
-    Epoch 4/4
-    31005/31005 [==============================] - 84s - loss: 0.5961 - val_loss: 0.5811
+    Train on 55858 samples, validate on 6207 samples
+    Epoch 1/50
+    55858/55858 [==============================] - 26s - loss: 0.8714 - val_loss: 0.8091
+    Epoch 2/50
+    55858/55858 [==============================] - 25s - loss: 0.7636 - val_loss: 0.7331
+    Epoch 3/50
+    55858/55858 [==============================] - 25s - loss: 0.7031 - val_loss: 0.6703
+    Epoch 4/50
+    55858/55858 [==============================] - 25s - loss: 0.6572 - val_loss: 0.6524
+...
+    Epoch 48/50
+    55858/55858 [==============================] - 25s - loss: 0.5443 - val_loss: 0.5761
+    Epoch 49/50
+    55858/55858 [==============================] - 25s - loss: 0.5445 - val_loss: 0.5869
+    Epoch 50/50
+    55858/55858 [==============================] - 25s - loss: 0.5429 - val_loss: 0.5710
+
+
+### Visualise Training
+Lets plot the training loss vs the valiation loss to get a better idea of whether the network is overfitting, underfitting etc. A good resource for interpreting the results can be found [here](http://cs231n.github.io/neural-networks-3/). 
+
+
+```python
+import matplotlib.pyplot as plt
+
+fig = plt.figure(figsize=(12, 5))
+plt.plot(history.history['loss'], label='loss')
+plt.plot(history.history['val_loss'], label='val_loss')
+plt.legend()
+```
+
+
+{% include image.html img="/assets/images/machine-learning/forecasting_image_0.png" %}
 
 
 ### Validation
@@ -930,9 +1003,11 @@ for i, horizon in enumerate(horizons):
 
 ```
 
-    MSE 0.603, MAE 0.574
-    MSE 0.818, MAE 0.669 for horizon 1
-    MSE 0.387, MAE 0.479 for horizon 12
+    MSE 0.515, MAE 0.538
+    MSE 0.691, MAE 0.622 for horizon 1
+    MSE 0.39, MAE 0.477 for horizon 6
+    MSE 0.354, MAE 0.458 for horizon 12
+    MSE 0.623, MAE 0.595 for horizon 24
 
 
 
@@ -945,38 +1020,34 @@ predicted_signal = invert_all_prediction_differences(
     inverse_scale, 
     features['wind_speed'][sequence_offset+row_split:])
 
-print("Original Signal MAE is {:.3}".format(
-        mean_absolute_error(
-            features[features.filter(regex='prediction').columns][sequence_offset+row_split:], 
-            predicted_signal)))
-
 for i, horizon in enumerate(horizons):
     print("Original Signal MAE for horizon {} is {:.3}".format(horizon,
         mean_absolute_error(
-            features['prediction_' + str(horizon)][sequence_offset+row_split:], 
-            predicted_signal[:,i])))
+            features['wind_speed'][sequence_offset+row_split+horizon:],
+            predicted_signal[:-horizon,i])))
 
 ```
 
-    Original Signal MAE is 4.3
-    Original Signal MAE for horizon 1 is 4.2
-    Original Signal MAE for horizon 12 is 4.4
+    Original Signal MAE for horizon 1 is 0.864
+    Original Signal MAE for horizon 6 is 1.26
+    Original Signal MAE for horizon 12 is 1.38
+    Original Signal MAE for horizon 24 is 1.5
 
 
 ### Visualising 
 
 Finally, we should visualise the predicted wind speeds. We will draw a plot for each time horizon independently. 
 
+We can see from the plots that the predictions follow the signal trends quite well. As the signal is very unstable (lots of minor and major adjustments), we can only expect the short term horizon to match it well, as the adjustment to current is minor (remember we're predicting differences). The further out the horizon the less accurate it is in terms of following the exact jagged edges of the original signal which is expected as modelling such a jagged and unstable signal exactly is extermely difficult (if possible due to bad observations). However, as mentioned it is the general trend and strenght that is important and we can see it performs quite well. With better observational data from a more stable source (and height), this apparent discrepancies would start to dissapear and the signal would have a much lower MAE. In particular the power output of turbines would be much smoother than this and hence fit much nicer.
+
+
 
 ```python
 import matplotlib.pyplot as plt
 
 # plot comparison with observation, numerical weather model and our prediction
-plot_samples=250
+plot_samples=600
 plots = len(horizons)
-
-real_signal = features['wind_speed'][sequence_offset+row_split:].values
-nems4_predicted_signal = features['nems4_wind_speed'][sequence_offset+row_split:].shift(nems4_lookahead)
 
 fig = plt.figure(figsize=(14, 5 * plots))
 fig.suptitle("Model Prediction at each Horizon")
@@ -984,24 +1055,26 @@ fig.suptitle("Model Prediction at each Horizon")
 for i, horizon in enumerate(horizons):
     plt.subplot(plots,1,i+1)
     
-    plt.plot(real_signal[:plot_samples], label='actual')
-    plt.plot(nems4_predicted_signal.values[:plot_samples], label='nems4')
+    real_signal = features['wind_speed'][sequence_offset+row_split+horizon:].values
+    
+    plt.plot(real_signal[:plot_samples], label='observed')
     plt.plot(predicted_signal[:plot_samples, i], label='predicted')
     plt.title("Prediction for {} Hour Horizon".format(horizon))
     plt.xlabel("Hour")
     plt.legend()
+    
+fig.tight_layout()
+plt.subplots_adjust(top=0.95)
 
 ```
 
-{% include image.html img="/assets/images/machine-learning/forecasting_image_0.png" %}
+{% include image.html img="/assets/images/machine-learning/forecasting_image_1.png" %}
+
 
 ### Critique 
 
 One very important property we are missing for our predictions, is the confidence our model has in a given prediction - aka credible interval. We can actually extend this model and add a Mixture Density Network ([MDN](http://edwardlib.org/tutorials/mixture-density-network)) as the final layer in the network. MDNs are very useful when combined with neural networks, where the outputs of the neural network are the parameters of the mixture model, rather than direct prediction of the data label. So for each input, you would have a set of mean parameters, a set of standard deviation parameters, and a set of probabilities that the output point would fall into those gaussian distributions ([taken from](http://blog.otoro.net/2015/06/14/mixture-density-networks/)). In a follow up post we will extend our model with an MDN.
 
 Another critique is that we don't do any feature engineering at all. While one of the stated benefits of deep learning in general is its inherent ability to extract latent features, it would be beneficial at least to test out some standard forecasting features such as trend strenghts etc. They may or may not improve the result. Another interesting idea which Uber recently published about their use of LSTMs for forecasting was to use a separate LSTM autoencoder network to create additional features as input to the LSTM model for prediction. See their article [here](https://eng.uber.com/neural-networks/). This is very easy to achieve with Keras. 
-
-
-
 
 
