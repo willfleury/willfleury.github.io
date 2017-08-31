@@ -19,6 +19,7 @@ description: Data Architecture, Machine Learning, Computer Science and other stu
 
 ### Machine Learning
 * [Global Black-Box Optimization applied to Hyper-parameter Tuning]({% post_url /machine-learning/2017-05-15-hyperparameter-optimisation %})
+* [Short Term Forecasting using Recurrent Neural Networks]({% post_url /machine-learning/2017-09-01-short-term-forceasting-lstm %})
 
 
 ### Modern Data Warehouse Architectures 
