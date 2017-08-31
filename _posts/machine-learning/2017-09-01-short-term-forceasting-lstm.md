@@ -29,16 +29,8 @@ To see an application of ARIMA for forecasting and the method for determining th
 
 ### Why use a Recurrent Neural Network
 
-Recurrent neural networks enable the learning and encoding of temporal features of a signal. This is idea for forecasting signals which are in some way predictive based on past events. LSTMs are a type of recurrent networks that overcome some of the historic issues related to training recurrent networks, such as the [vanishing gradients problem](https://en.wikipedia.org/wiki/Vanishing_gradient_problem). We won't delve into the details of LSTMs here and will instead point you to this [article](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) for a thorough overview. 
+Recurrent neural networks enable the learning and encoding of temporal features of a signal. This is ideal for forecasting signals which are in some way predictive based on past events. LSTMs are a type of recurrent networks that overcome some of the historic issues related to training recurrent networks, such as the [vanishing gradients problem](https://en.wikipedia.org/wiki/Vanishing_gradient_problem). We won't delve into the details of LSTMs here and will instead point you to this [article](http://colah.github.io/posts/2015-08-Understanding-LSTMs/) for a thorough overview. 
 
-
-
-```python
-%matplotlib inline
-
-import seaborn as sns
-sns.set_color_codes()
-```
 
 ## Weather Data
 
@@ -861,8 +853,6 @@ def build_model(layers):
     return model
 ```
 
-    Using TensorFlow backend.
-
 
 ### Train and Evaluate the Model
 
@@ -875,7 +865,7 @@ The batch_size here refers to the number of samples to be taken between gradient
 
 #### Using AWS or Google Cloud GPUs
 
-While a GPU is absolutely essential to train a large network, for a small network like we are playing with in this notebook you don't gain massively. I found that it was about 4 times faster on a p2.xlarge GPU instance on AWS compared to locally on my 4 core i7. Most of the cloud providers give access to a variety of options for deep learning with optimized instances and GPUs. We won't go into the details of how to do for each or the benefits of one versus the other in this post. We trained the model on a p2.2xlarge instance on AWS using the AWS Spot market which cost approx $0.3 / hour. Training 100 epocs took approximately 2 hours. 
+While a GPU is absolutely essential to train a large network, for a small network like we are playing with in this notebook you don't gain massively. I found that it was about 4 times faster on a p2.xlarge GPU instance on AWS compared to locally on my 4 core i7. Most of the cloud providers give access to a variety of options for deep learning with optimized instances and GPUs. We won't go into the details of how to do for each or the benefits of one versus the other in this post. We trained the model on a p2.2xlarge instance on AWS using the AWS Spot market which cost approx $0.3 / hour. Training 50 epocs took approximately 20 minutes. 
 
 
 #### Hyperparameter Tuning
