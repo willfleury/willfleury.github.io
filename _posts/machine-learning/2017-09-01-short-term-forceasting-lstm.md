@@ -51,7 +51,7 @@ It is also highly advisable to include at least one numerical weather models pre
 
 We get the observational data from NOAA. NOAA collects the weather station observations from stations in countries all around the world. To get it for a given station, you just need to know whats known as the USAF and WBAN IDs. We are using Barcelona El Prat Airport in this notebook but you can change to whatever. 
 
-We providea script that allows you to download the data locally
+We provide a script that allows you to download the data locally
 
     data/download-observations.sh
     
@@ -119,7 +119,7 @@ def read_nems4(years, prediction_hours=12):
     predictions = predictions.set_index('time')
     predictions.index.name = 'timestamp'
     
-    # shift dataset back 12 hours as its a the value is the prediction for the given timestmap 12 hours previously
+    # shift dataset back 12 hours as the value is the prediction for the given timestmap 12 hours previously
     predictions.index = pd.to_datetime(predictions.index) - pd.Timedelta(hours=nems4_lookahead)
     predictions.index.tz = 'UTC'
 
@@ -877,7 +877,7 @@ While a GPU is absolutely essential to train a large network, for a small networ
 
 #### Hyperparameter Tuning
 
-Hyperparameter tuning is an essential part of any machine learning process. Do not fall into the trap of trying to manually hand tune the parameters. There are many formal approaches which optimize this (see my blog [post](http://www.willfleury.com/machine-learning/bayesian-optimization/2017/05/15/hyperparameter-optimisation.html) on the suject). If you are running on Google Cloud Machine Learning it actually has the ability to perform the hyperparameter optimization built into the API. Exactly what type of optimization it performs under the hood is unclear however. 
+Hyperparameter tuning is an essential part of any machine learning process. Do not fall into the trap of trying to manually hand tune the parameters. There are many formal approaches which optimize this (see my blog [post](http://www.willfleury.com/machine-learning/bayesian-optimization/2017/05/15/hyperparameter-optimisation.html) on the subject). If you are running on Google Cloud Machine Learning it actually has the ability to perform the hyperparameter optimization built into the API. Exactly what type of optimization it performs under the hood is unclear however. 
 
 *As mentioned already in this post, we have not performed an exhaustive training on this model and as such one could easily achieve better results by changing the number of layers, the size of the layers, the sequence_lenght or any one of the other tunable hyperparameters for this model.*
 
@@ -1035,11 +1035,17 @@ for i, horizon in enumerate(horizons):
     Real scale predictions at horizon 24 has MAE 1.500, MSE 3.953, RMSE 1.988
 
 
-### Compare Model with Persistence Forecast
+### Compare Model against Baselines 
+
+#### Persistence Method Forecast
 
 As already mentioned, a [persistence forecast](http://ww2010.atmos.uiuc.edu/(Gh)/guides/mtr/fcst/mth/prst.rxml) is a good baseline comparison for any forecasting model. 
 
 We can see that the LSTM model outperforms the persistence method at all horizons. At the 1 hour horizon it is very close as to be expected given such horizons the weather does not change dramatically. At the 6 and 12 hour horizons the LSTM model outperforms the persistence method by a much larger factor (roughly twice as accurate with an MAE value roughly half that of the persistence method). The 24 hour prediction is only just better than the persistence model which shows the cyclical nature of the wind speed.
+
+#### NEMS4 Numerical Model
+Although we have mentioned that the NEMS4 model cannot really be taken as trying to predict the observation at the station we are taking the measurements from, it still serves as a useful baseline to compare against. The general weather patterns and fluxations will be taken into account by this model and we would expect to see it perform better than the simple persistence method forecast. We only have one prediction horizon for the NEMS4 model which is for 12 hours in the future. As expected, we we can see that the NEMS4 model does in fact outperform the persistence method with an MAE of `1.72` vs `2.32`. Also as expected, the LSTM model also performs better than the NEMS4.
+
 
 With better quality data, and more exhaustive tuning and training of the LSTM network we could resonably expect much better results. 
 
@@ -1067,6 +1073,22 @@ evaluate_persistence_forecast(
     Persistence Method prediction at horizon  6 has MAE 2.008, MSE 6.574, RMSE 2.564
     Persistence Method prediction at horizon 12 has MAE 2.319, MSE 8.692, RMSE 2.948
     Persistence Method prediction at horizon 24 has MAE 1.861, MSE 6.116, RMSE 2.473
+
+
+```python
+def evaluate_nems4_forecast():
+    real = features.nems4_wind_speed.shift(nems4_lookahead).dropna()
+    pred = features.wind_speed[nems4_lookahead:]
+
+    print("12 hour NEMS4 vs Observed has MAE {:.3f}, MSE {:.3f}, RMSE {:.3f}".format(
+            mean_absolute_error(real, pred),
+            mean_squared_error(real, pred),
+            sqrt(mean_squared_error(real, pred))))
+
+evaluate_nems4_forecast()
+```
+
+    12 hour NEMS4 vs Observed has MAE 1.719, MSE 4.777, RMSE 2.186
 
 
 ### Visualising 
