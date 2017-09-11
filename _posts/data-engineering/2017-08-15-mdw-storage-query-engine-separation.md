@@ -12,7 +12,7 @@ This post is part of a series on Modern Data Warehouse Architectures and was wri
 ### Series Overview
 * [Modern Data Warehouses]({% post_url /data-engineering/2017-08-15-mdw-storage-query-engine-separation %})
 * [Design Considerations I - Storage]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-I %})
-* [Design Considerations II - Real-time & Resource Isolation]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-II %})
+* [Design Considerations II - Real-time]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-II %})
 * [Design Considerations III - Query Engine]({% post_url /data-engineering/2017-08-15-mdw-design-considerations-III %})
 
 
