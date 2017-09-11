@@ -7,7 +7,7 @@ categories: [machine-learning, forecasting, LSTM]
 
 # Short Term Forecasting using Recurrent Neural Networks
 
-The notebook this blog post was generated from can be found on [github](https://github.com/willfleury/wind-forecasting/blob/master/Forecasting.ipynb)
+The notebook for this blog post was written in collaboration with [Nicolas Juguet](https://www.linkedin.com/in/nicolas-juguet-68395720/) and can be found on [github](https://github.com/willfleury/wind-forecasting/blob/master/Forecasting.ipynb)
 
 
 ## Overview
