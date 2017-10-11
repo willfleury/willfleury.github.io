@@ -1,7 +1,7 @@
 ---
 layout: default
-title: Why Separate Storage and Compute?
-description: Why separate storage and compute (query) concerns for a modern data warehouse architecture?
+title: Modern Data Warehouses
+description: Designing Modern Data Warehouse Architectures
 categories: [data-engineering, analytics]
 ---
 
