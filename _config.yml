@@ -5,6 +5,8 @@ markdown: kramdown
 
 author: Will Fleury
 
+google_analytics: UA-108117798-1
+
 future: true
 
 gems:
