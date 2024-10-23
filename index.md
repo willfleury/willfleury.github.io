@@ -1,8 +1,7 @@
 {% include image.html img="/assets/images/general/photo.png" style="float:right;padding-left:0.5em" %}
 
-Hi, I'm Will Fleury, a Data Engineer, Data Architect and Machine Learning practitioner. I am originally from Ireland but have lived in various countries from Saigon, Vietnam to Barcelona, Spain where I am currently. On this site I attempt to document interesting projects and ideas from my professional journey, in an attempt to organise my own thoughts and catalogue my journey.
+I’ve been building products and teams in the AI space for some time now. At times on the side creating the AI models and at times on the side applying them. During this time, I’ve played many roles in engineering, data science, product, consulting and academia. I take a “Keep it Simple” approach to what I’m working on and the teams I lead. Above all, I love learning new things and meeting new challenges. I try to read a CS paper every day to stay on top of the latest and most important advances in the field (also for pure intellectual curiosity).
 
-I enjoy clear thinking and building scalable analytics architectures which enable the opening of new and exciting user experiences. My academic background is heavily engineering focused. However, I enjoy both the practical and theoretical aspects of problem solving. My PhD was in Decision Theory with applications primarily in Operations Research and Finance. 
+I have not published anything to this site in years. I’m hoping to change that soon. I have a few posts in the works on data architecture, machine learning and computer science. Stay tuned!
 
-I am lucky to have had the opportunity to work on a range of interesting problems with interesting companies. I have overseen the design and implementation of data platforms at the 1B+ user scale (see the following [blog series]({% post_url /data-engineering/2017-03-01-overview %}) for more details). I have served a range of other roles over the years and even tried my hand as a founder in a couple of startups. See my LinkedIn [Profile](https://www.linkedin.com/in/willfleury) for more information.
-
+If you want to connect, reach out on [LinkedIn](https://www.linkedin.com/in/willfleury/).
